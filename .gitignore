@@ -102,3 +102,11 @@ dist
 
 # TernJS port file
 .tern-port
+
+# Carlos ignored folders/files
+**/Refs/
+*.blend1
+*.kra~
+*.png~
+*.PNG~
+*autosave.kra
