@@ -112,6 +112,7 @@ dist
 
 # Carlos ignored folders/files
 **/Refs/
+**/Playblast/
 *.blend1
 *.kra~
 *.png~
