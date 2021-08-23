@@ -2,21 +2,64 @@ const { expect } = require("chai");
 const { ethers, upgrades } = require("hardhat");
 
 describe("CompiBrain", function () {
-  it("Should return the new greeting once it's changed", async function () {
-    //const Greeter = await ethers.getContractFactory("Greeter");
-    //const greeter = await Greeter.deploy("Hello, world!");
-    //await greeter.deployed();
-    const CompiBrain = await ethers.getContractFactory("CompiBrain");
-    const compibrain = await upgrades.deployProxy(CompiBrain, ["Hello, world!"]);
-    await compibrain.deployed();
+    let compibrain;
+    let compicactus_pfp;
 
-    expect(await compibrain.greet()).to.equal("Hello, world!");
+    before(async function () {
+        const CompiBrain = await ethers.getContractFactory("CompiBrain");
+        compibrain = await upgrades.deployProxy(CompiBrain, ["Hello, world!"]);
+        await compibrain.deployed();
 
-    const setGreetingTx = await compibrain.setGreeting("Hola, mundo!");
+        const CompicactusPFP = await ethers.getContractFactory("CompicactusPFP");
+        compicactus_pfp = await upgrades.deployProxy(CompicactusPFP, ["CompicactusPFP_", "CPFP", "https://"]);
+        await compicactus_pfp.deployed();
+    });
 
-    // wait until the transaction is mined
-    await setGreetingTx.wait();
+    it("Enabling contracts", async function () {
+        const enableContractTx = await compibrain.enableContract(compicactus_pfp.address);
 
-    expect(await compibrain.greet()).to.equal("Hola, mundo!");
-  });
+        await enableContractTx.wait();
+
+        expect(await compibrain.isContractEnabled(compicactus_pfp.address)).to.equal(true);
+    });
+
+    it("Adding questions", async function () {
+        const addQuestionTx = await compibrain.addQuestion(compicactus_pfp.address, 1, "Hi", "Hi there!");
+
+        await addQuestionTx.wait();
+
+        const answer = await compibrain.getQuestion(compicactus_pfp.address, 1, "Hi");
+
+        expect(answer).to.equal("Hi there!");
+    });
+
+    it("Muting questions", async function () {
+        const muteQuestionTx = await compibrain.muteQuestion(compicactus_pfp.address, 1, "Hi");
+
+        await muteQuestionTx.wait();
+
+        const is_muted = await compibrain.isQuestionMuted(compicactus_pfp.address, 1, "Hi");
+
+        expect(is_muted).to.equal(true);
+    });
+
+    it("Unmuting questions", async function () {
+        const unmuteQuestionTx = await compibrain.unmuteQuestion(compicactus_pfp.address, 1, "Hi");
+
+        await unmuteQuestionTx.wait();
+
+        const is_muted = await compibrain.isQuestionMuted(compicactus_pfp.address, 1, "Hi");
+
+        expect(is_muted).to.equal(false);
+    });
+
+    it("Setting names", async function () {
+        const setNameTx = await compibrain.setName(compicactus_pfp.address, 1, "Felix");
+
+        await setNameTx.wait();
+
+        const name = await compibrain.getName(compicactus_pfp.address, 1);
+
+        expect(name).to.equal("Felix");
+    });
 });
