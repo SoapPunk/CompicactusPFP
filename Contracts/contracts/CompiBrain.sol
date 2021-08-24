@@ -1,4 +1,4 @@
-//SPDX-License-Identifier: Unlicense
+//SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
@@ -8,11 +8,17 @@ import "@openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgrad
 
 import { CompicactusPFP } from "./CompicactusPFP.sol";
 
-contract CompiBrain is Initializable, AccessControlEnumerableUpgradeable {
-    string private greeting;
+import {NativeMetaTransaction} from "./NativeMetaTransaction.sol";
+import {ContextMixin} from "./ContextMixin.sol";
 
-    // Mapping from contract to enabled boolean
-    mapping (address => bool) private _nftContractEnabled;
+// TODO get question list / create events
+
+contract CompiBrain is
+    Initializable,
+    AccessControlEnumerableUpgradeable,
+    NativeMetaTransaction,
+    ContextMixin
+    {
 
     // Mapping from token+question to answer
     mapping (string => string) private _nftQuestionAnswer;
@@ -23,38 +29,12 @@ contract CompiBrain is Initializable, AccessControlEnumerableUpgradeable {
     // Mapping from token to name
     mapping (string => string) private _nftName;
 
-    bytes32 public constant MODERATOR_ROLE = keccak256("MODERATOR_ROLE");
-
-    function initialize(string memory _greeting) public initializer {
-        console.log("Deploying a Greeter with greeting:", _greeting);
-        greeting = _greeting;
+    function initialize() public initializer {
 
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
-        _setupRole(MODERATOR_ROLE, _msgSender());
     }
 
-
-    function enableContract(address _contract) public {
-        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender())||hasRole(MODERATOR_ROLE, _msgSender()), "CompiBrain: must have admin or moderator role to enable contract");
-
-        console.log("Enabling contract '%s'", _contract);
-
-        _nftContractEnabled[_contract] = true;
-    }
-
-    function disableContract(address _contract) public {
-        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender())||hasRole(MODERATOR_ROLE, _msgSender()), "CompiBrain: must have admin or moderator role to disable contract");
-
-        console.log("Disabling contract '%s'", _contract);
-
-        _nftContractEnabled[_contract] = false;
-    }
-
-    function isContractEnabled(address _contract) public view returns (bool) {
-        return _nftContractEnabled[_contract];
-    }
-
-    function createQuestionId(address _contract, uint256 id, string memory question) private view returns (string memory) {
+    function createQuestionId(address _contract, uint256 id, string memory question) private pure returns (string memory) {
 
         string memory questionId = string(abi.encodePacked(_contract, "-", id, "-", question));
 
@@ -62,7 +42,6 @@ contract CompiBrain is Initializable, AccessControlEnumerableUpgradeable {
     }
 
     function addQuestion(address _contract, uint256 id, string memory question, string memory answer) public {
-        require(_nftContractEnabled[_contract], "CompiBrain: contract is not enabled");
 
         CompicactusPFP _cpfpContract = CompicactusPFP(_contract);
         bool is_owner = _cpfpContract.ownerOf(id) == _msgSender();
@@ -74,7 +53,6 @@ contract CompiBrain is Initializable, AccessControlEnumerableUpgradeable {
     }
 
     function getQuestion(address _contract, uint256 id, string memory question) public view returns (string memory) {
-        require(_nftContractEnabled[_contract], "CompiBrain: contract is not enabled");
 
         string memory questionId = createQuestionId(_contract, id, question);
 
@@ -82,7 +60,7 @@ contract CompiBrain is Initializable, AccessControlEnumerableUpgradeable {
     }
 
     function muteQuestion(address _contract, uint256 id, string memory question) public {
-        require(hasRole(MODERATOR_ROLE, _msgSender()), "CompiBrain: must have moderator role to mute question");
+        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "CompiBrain: must have admin role to mute question");
 
         string memory questionId = createQuestionId(_contract, id, question);
 
@@ -90,7 +68,7 @@ contract CompiBrain is Initializable, AccessControlEnumerableUpgradeable {
     }
 
     function unmuteQuestion(address _contract, uint256 id, string memory question) public {
-        require(hasRole(MODERATOR_ROLE, _msgSender()), "CompiBrain: must have moderator role to unmute question");
+        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "CompiBrain: must have admin role to unmute question");
 
         string memory questionId = createQuestionId(_contract, id, question);
 
@@ -114,11 +92,20 @@ contract CompiBrain is Initializable, AccessControlEnumerableUpgradeable {
     }
 
     function getName(address _contract, uint256 id) public view returns (string memory) {
-        require(_nftContractEnabled[_contract], "CompiBrain: contract is not enabled");
 
         string memory questionId = createQuestionId(_contract, id, "");
 
         return _nftName[questionId];
     }
 
+    // This is to support Native meta transactions
+    // never use msg.sender directly, use _msgSender() instead
+    function _msgSender()
+        internal
+        override
+        view
+        returns (address sender) // Eibriel removed "payable"
+    {
+            return ContextMixin.msgSender();
+    }
 }
