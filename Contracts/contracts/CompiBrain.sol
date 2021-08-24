@@ -11,7 +11,7 @@ import { CompicactusPFP } from "./CompicactusPFP.sol";
 import {NativeMetaTransaction} from "./NativeMetaTransaction.sol";
 import {ContextMixin} from "./ContextMixin.sol";
 
-// TODO get question list / create events
+// TODO get question list / create events / remove question
 
 contract CompiBrain is
     Initializable,
@@ -28,6 +28,10 @@ contract CompiBrain is
 
     // Mapping from token to name
     mapping (string => string) private _nftName;
+
+    // Mapping from token to list of questions
+    mapping (string => string[]) private _nftQuestions;
+
 
     function initialize() public initializer {
 
@@ -49,7 +53,36 @@ contract CompiBrain is
 
         string memory questionId = createQuestionId(_contract, id, question);
 
+        if (keccak256(bytes(_nftQuestionAnswer[questionId])) == keccak256(bytes(""))) {
+            console.log("Adding question");
+            string memory tokenId = createQuestionId(_contract, id, "");
+            _nftQuestions[tokenId].push(question);
+        }
+
         _nftQuestionAnswer[questionId] = answer;
+
+    }
+
+    function removeQuestion(address _contract, uint256 id, uint256 questionId) public {
+        string memory tokenId = createQuestionId(_contract, id, "");
+
+        // Move element to the end
+        _nftQuestions[tokenId][questionId] = _nftQuestions[tokenId][_nftQuestions[tokenId].length - 1];
+        // Remove element
+        _nftQuestions[tokenId].pop();
+    }
+
+    function getQuestions(address _contract, uint256 id) public view returns (string[] memory) {
+        string memory tokenId = createQuestionId(_contract, id, "");
+
+        string[] memory memoryArray = new string[](10);
+
+        for(uint8 i = 0; i < _nftQuestions[tokenId].length; i++) {
+            if (i > 10) break;
+            memoryArray[i] = _nftQuestions[tokenId][i];
+        }
+
+        return memoryArray;
     }
 
     function getQuestion(address _contract, uint256 id, string memory question) public view returns (string memory) {

@@ -39,6 +39,15 @@ describe("CompiBrain", function () {
         expect(answer).to.equal("Hi there!");
     });
 
+    it("Getting questions", async function () {
+
+        const answer = await compibrain.getQuestions(compicactus_pfp.address, 0);
+
+        console.log(answer);
+
+        //expect(answer).to.equal([ 'Hi', '', '', '', '', '', '', '', '', '' ]);
+    });
+
     it("Muting questions", async function () {
         const muteQuestionTx = await compibrain.muteQuestion(compicactus_pfp.address, 0, "Hi");
 
