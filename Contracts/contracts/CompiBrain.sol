@@ -54,15 +54,25 @@ contract CompiBrain is
         }
 
         _nftQuestionAnswer[_contract][id][scene][question] = answer;
+
+        emit QuestionAdded(_contract, id, scene, question, answer);
     }
 
 
-    function removeQuestion(address _contract, uint256 id, string memory scene, uint256 questionId) public {
+    function removeQuestion(address _contract, uint256 id, string memory scene, string memory question, uint256 questionId) public {
+
+        CompicactusPFP _cpfpContract = CompicactusPFP(_contract);
+        bool is_owner = _cpfpContract.ownerOf(id) == _msgSender();
+        require(is_owner, "CompiBrain: sender must be the owner of the token");
+
+        require(keccak256(bytes(_nftQuestions[_contract][id][scene][questionId])) == keccak256(bytes(question)), "CompiBrain: questionId is not pointing to the expected question");
 
         // Move element to the end
         _nftQuestions[_contract][id][scene][questionId] = _nftQuestions[_contract][id][scene][ _nftQuestions[_contract][id][scene].length - 1 ];
         // Remove element
         _nftQuestions[_contract][id][scene].pop();
+
+        emit QuestionRemoved(_contract, id, scene, question, questionId);
     }
 
 
@@ -94,6 +104,8 @@ contract CompiBrain is
         require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "CompiBrain: must have admin role to mute question");
 
         _nftQuestionMuted[_contract][id][scene][question] = true;
+
+        emit QuestionMuted(_contract, id, scene, question);
     }
 
 
@@ -101,6 +113,8 @@ contract CompiBrain is
         require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "CompiBrain: must have admin role to unmute question");
 
         _nftQuestionMuted[_contract][id][scene][question] = false;
+
+        emit QuestionUnmuted(_contract, id, scene, question);
     }
 
 
@@ -116,6 +130,8 @@ contract CompiBrain is
         require(is_owner, "CompiBrain: sender must be the owner of the token");
 
         _nftName[_contract][id] = name;
+
+        emit nameSet(_contract, id, name);
     }
 
 
@@ -123,6 +139,55 @@ contract CompiBrain is
 
         return _nftName[_contract][id];
     }
+
+
+    // Events
+
+
+    /**
+    * @dev Emits when owner add a question
+    * @param _contract - ERC721 contract address
+    * @param id - Id of the ERC721 token
+    * @param scene - Unique name for the scene to add de question and answer
+    * @param question - Unique question
+    * @param answer - Answer for that question
+    */
+    event QuestionAdded(address _contract, uint256 id, string scene, string question, string answer);
+
+    /**
+    * @dev Emits when owner removes a question
+    * @param _contract - ERC721 contract address
+    * @param id - Id of the ERC721 token
+    * @param scene - Unique name of the scene
+    * @param questionId - Id of the question in the array
+    */
+    event QuestionRemoved(address _contract, uint256 id, string scene, string question, uint256 questionId);
+
+    /**
+    * @dev Emits when an admin mute a question
+    * @param _contract - ERC721 contract address
+    * @param id - Id of the ERC721 token
+    * @param scene - Unique name of the scene
+    * @param question - Unique question
+    */
+    event QuestionMuted(address _contract, uint256 id, string scene, string question);
+
+    /**
+    * @dev Emits when an admin unmute a question
+    * @param _contract - ERC721 contract address
+    * @param id - Id of the ERC721 token
+    * @param scene - Unique name of the scene
+    * @param question - Unique question
+    */
+    event QuestionUnmuted(address _contract, uint256 id, string scene, string question);
+
+    /**
+    * @dev Emits when the owner names the token
+    * @param _contract - ERC721 contract address
+    * @param id - Id of the ERC721 token
+    * @param name - Name of the token
+    */
+    event nameSet(address _contract, uint256 id, string name);
 
 
     // This is to support Native meta transactions

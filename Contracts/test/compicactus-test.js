@@ -87,8 +87,11 @@ describe("CompiBrain", function () {
 
 
     it("Removing questions", async function () {
+        const removeQuestionBadTx = compibrain.removeQuestion(compicactus_pfp.address, 0, "test", "No Hi", 0);
 
-        const removeQuestionTx = await compibrain.removeQuestion(compicactus_pfp.address, 0, "test", 0);
+        await expect(removeQuestionBadTx).to.be.revertedWith('CompiBrain: questionId is not pointing to the expected question');
+
+        const removeQuestionTx = await compibrain.removeQuestion(compicactus_pfp.address, 0, "test", "Hi", 0);
 
         await removeQuestionTx.wait();
 
