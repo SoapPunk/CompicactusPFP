@@ -105,6 +105,13 @@ describe("CompiBrain", function () {
     });
 
 
+    it("Prevent remove question for tokens owned by others", async function () {
+        const removeQuestionTx = compibrain.removeQuestion(compicactus_pfp.address, 1, "_", "_", 0);
+
+        await expect(removeQuestionTx).to.be.revertedWith('CompiBrain: sender must be the owner of the token');
+    });
+
+
     it("Prevent set name for tokens owned by others", async function () {
         const setNameTx = compibrain.setName(compicactus_pfp.address, 1, "Felix");
 
