@@ -1,6 +1,5 @@
 require("@nomiclabs/hardhat-waffle");
 require('@openzeppelin/hardhat-upgrades');
-require("@nomiclabs/hardhat-etherscan");
 
 const fs = require('fs');
 const maticvigil = fs.readFileSync(".maticvigil").toString().trim();
