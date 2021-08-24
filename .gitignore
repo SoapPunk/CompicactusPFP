@@ -4,6 +4,10 @@
 *.blend4
 *.blend5
 
+.ethkey
+.maticvigil
+.secret
+
 
 # Logs
 logs

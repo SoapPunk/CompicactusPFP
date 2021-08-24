@@ -1,5 +1,11 @@
 require("@nomiclabs/hardhat-waffle");
 require('@openzeppelin/hardhat-upgrades');
+require("@nomiclabs/hardhat-etherscan");
+
+const fs = require('fs');
+const maticvigil = fs.readFileSync(".maticvigil").toString().trim();
+const mnemonic = fs.readFileSync(".secret").toString().trim();
+const etherscanApiKey = fs.readFileSync(".ethkey").toString().trim();
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -19,4 +25,21 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
  */
 module.exports = {
   solidity: "0.8.4",
+
+  networks: {
+    hardhat: {
+    },
+    mumbai: {
+        url: 'https://rpc-mumbai.maticvigil.com/v1/'+maticvigil,
+        chainId: 80001,
+        accounts: {
+            mnemonic: mnemonic,
+
+        }
+    }
+  },
+
+  etherscan: {
+    apiKey: etherscanApiKey
+  },
 };
