@@ -6,7 +6,9 @@ import "hardhat/console.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgradeable.sol";
 
-import { CompicactusPFP } from "./CompicactusPFP.sol";
+// import { CompicactusPFP } from "./CompicactusPFP.sol";
+
+import { ERC721Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 
 import {NativeMetaTransaction} from "./NativeMetaTransaction.sol";
 import {ContextMixin} from "./ContextMixin.sol";
@@ -44,8 +46,8 @@ contract CompiBrain is
 
     function addQuestion(address _contract, uint256 id, string memory scene, string memory question, string memory answer) public {
 
-        CompicactusPFP _cpfpContract = CompicactusPFP(_contract);
-        bool is_owner = _cpfpContract.ownerOf(id) == _msgSender();
+        ERC721Upgradeable _erc721 = ERC721Upgradeable(_contract);
+        bool is_owner = _erc721.ownerOf(id) == _msgSender();
         require(is_owner, "CompiBrain: sender must be the owner of the token");
 
         if (keccak256(bytes(_nftQuestionAnswer[_contract][id][scene][question])) == keccak256(bytes(""))) {
@@ -61,8 +63,8 @@ contract CompiBrain is
 
     function removeQuestion(address _contract, uint256 id, string memory scene, string memory question, uint256 questionId) public {
 
-        CompicactusPFP _cpfpContract = CompicactusPFP(_contract);
-        bool is_owner = _cpfpContract.ownerOf(id) == _msgSender();
+        ERC721Upgradeable _erc721 = ERC721Upgradeable(_contract);
+        bool is_owner = _erc721.ownerOf(id) == _msgSender();
         require(is_owner, "CompiBrain: sender must be the owner of the token");
 
         require(keccak256(bytes(_nftQuestions[_contract][id][scene][questionId])) == keccak256(bytes(question)), "CompiBrain: questionId is not pointing to the expected question");
@@ -125,8 +127,8 @@ contract CompiBrain is
 
 
     function setName(address _contract, uint256 id, string memory name) public {
-        CompicactusPFP _cpfpContract = CompicactusPFP(_contract);
-        bool is_owner = _cpfpContract.ownerOf(id) == _msgSender();
+        ERC721Upgradeable _erc721 = ERC721Upgradeable(_contract);
+        bool is_owner = _erc721.ownerOf(id) == _msgSender();
         require(is_owner, "CompiBrain: sender must be the owner of the token");
 
         _nftName[_contract][id] = name;
