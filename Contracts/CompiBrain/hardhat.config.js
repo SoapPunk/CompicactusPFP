@@ -2,9 +2,9 @@ require("@nomiclabs/hardhat-waffle");
 require('@openzeppelin/hardhat-upgrades');
 
 const fs = require('fs');
-const maticvigil = fs.readFileSync(".maticvigil").toString().trim();
-const mnemonic = fs.readFileSync(".secret").toString().trim();
-const etherscanApiKey = fs.readFileSync(".ethkey").toString().trim();
+const maticvigil = fs.readFileSync("../.maticvigil").toString().trim();
+const mnemonic = fs.readFileSync("../.secret").toString().trim();
+const etherscanApiKey = fs.readFileSync("../.ethkey").toString().trim();
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
