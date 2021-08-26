@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr" >
+<head>
+    <title>Compicactus</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta content="True" name="HandheldFriendly" />
+
+    <!--<link rel="StyleSheet" href="style/fonts.css" type="text/css" />-->
+
+    <link rel="icon" href="favicon.png" />
+    <link rel="canonical" href="https://eibriel.com" />
+
+    <script src="three.min.js"></script>
+    <script src="GLTFLoader.js"></script>
+
+</head>
+
+<style>
+html, body {
+  height: 100%;
+  margin: 0;
+}
+#c {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+</style>
+
+<body>
+    <canvas id="c"></canvas>
+
+<script>
+
+function main() {
+    function frameArea(sizeToFitOnScreen, boxSize, boxCenter, camera) {
+        const halfSizeToFitOnScreen = sizeToFitOnScreen * 0.5;
+        const halfFovY = THREE.MathUtils.degToRad(camera.fov * .5);
+        const distance = halfSizeToFitOnScreen / Math.tan(halfFovY);
+        // compute a unit vector that points in the direction the camera is now
+        // in the xz plane from the center of the box
+        const direction = (new THREE.Vector3())
+            .subVectors(camera.position, boxCenter)
+            .multiply(new THREE.Vector3(1, 0, 1))
+            .normalize();
+
+        // move the camera to a position distance units way from the center
+        // in whatever direction the camera was from the center already
+        camera.position.copy(direction.multiplyScalar(distance).add(boxCenter));
+
+        // pick some near and far values for the frustum that
+        // will contain the box.
+        camera.near = boxSize / 100;
+        camera.far = boxSize * 100;
+
+        camera.updateProjectionMatrix();
+
+        // point the camera to look at the center of the box
+        camera.lookAt(boxCenter.x, boxCenter.y, boxCenter.z);
+    }
+
+    const canvas = document.querySelector('#c');
+    const renderer = new THREE.WebGLRenderer({canvas});
+
+    //const gltfLoader = new GLTFLoader();
+    const gltfLoader = new THREE.GLTFLoader();
+    let url = 'https://ipfs.io/ipfs/QmTTFZTABAVsKGnLB5uYCtEdaVf39AtmUTquozSWB1CXge/Compicactus.glb';
+    gltfLoader.load(url, (gltf) => {
+        const root = gltf.scene;
+
+        let mixer = new THREE.AnimationMixer(root);
+
+        /*gltf.animations.forEach((clip) => {
+            console.log(clip);
+            //mixer.clipAction(clip).play();
+        });*/
+
+        let look_rl = mixer.clipAction(gltf.animations[5])
+        look_rl.play();
+
+        scene.add(root);
+        const clock = new THREE.Clock()
+
+        function animate() {
+            if (resizeRendererToDisplaySize(renderer)) {
+              const canvas = renderer.domElement;
+              camera.aspect = canvas.clientWidth / canvas.clientHeight;
+              camera.updateProjectionMatrix();
+            }
+
+
+            mixer.update(clock.getDelta())
+            //mixer.update(0.01)
+
+            renderer.render(scene, camera)
+
+            requestAnimationFrame(animate)
+        }
+
+        animate();
+
+        // compute the box that contains all the stuff
+        // from root and below
+        const box = new THREE.Box3().setFromObject(root);
+
+        const boxSize = box.getSize(new THREE.Vector3()).length();
+        const boxCenter = box.getCenter(new THREE.Vector3());
+
+        // set the camera to frame the box
+        frameArea(boxSize * 1, boxSize, boxCenter, camera);
+    });
+
+  const fov = 75;
+  const aspect = 2;  // the canvas default
+  const near = 0.1;
+  const far = 5;
+  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+  camera.position.z = 2;
+
+  const scene = new THREE.Scene();
+
+  {
+      const skyColor = 0xB1E1FF;  // light blue
+      const groundColor = 0xB97A20;  // brownish orange
+      const intensity = 1;
+      const light = new THREE.HemisphereLight(skyColor, groundColor, intensity);
+      scene.add(light);
+  }
+
+  //
+  /*
+  const boxWidth = 1;
+  const boxHeight = 1;
+  const boxDepth = 1;
+  const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
+
+  const material = new THREE.MeshBasicMaterial({color: 0x44aa88});  // greenish blue
+
+  const cube = new THREE.Mesh(geometry, material);
+  scene.add(cube);
+  */
+  //
+
+  function resizeRendererToDisplaySize(renderer) {
+    const canvas = renderer.domElement;
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    const needResize = canvas.width !== width || canvas.height !== height;
+    if (needResize) {
+      renderer.setSize(width, height, false);
+    }
+    return needResize;
+  }
+
+
+  /*function render(time) {
+    time *= 0.001;
+
+    if (resizeRendererToDisplaySize(renderer)) {
+      const canvas = renderer.domElement;
+      camera.aspect = canvas.clientWidth / canvas.clientHeight;
+      camera.updateProjectionMatrix();
+    }
+
+    requestAnimationFrame( animate );
+
+    var delta = clock.getDelta();
+
+    if ( mixer ) mixer.update( delta );
+
+    renderer.render(scene, camera);
+
+    requestAnimationFrame(render);
+  }
+
+  requestAnimationFrame(render);*/
+
+
+}
+
+main();
+
+
+</script>
+</body>
+</html>
