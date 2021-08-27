@@ -14,12 +14,19 @@ async function main() {
   // await hre.run('compile');
 
   // We get the contract to deploy
-  const CompicactusPFP = await hre.ethers.getContractFactory("CompicactusPFP");
-  const compicactusPFP = await CompicactusPFP.deploy("CompicactusPFP", "CPFP", "ipfs://baseUri");
+  // const CompicactusPFP = await hre.ethers.getContractFactory("CompicactusPFP");
+  // const compicactusPFP = await CompicactusPFP.deploy("CompicactusPFP", "CPFP", "ipfs://baseUri");
 
-  await compicactusPFP.deployed();
+  // await compicactusPFP.deployed();
 
-  console.log("Greeter deployed to:", compicactusPFP.address);
+  // console.log("Greeter deployed to:", compicactusPFP.address);
+
+
+  const CompiPFP = await ethers.getContractFactory("CompiPFP");
+  const compiPFP = await upgrades.deployProxy(CompiPFP, []);
+  await compiPFP.deployed();
+  console.log("CompiPFP deployed to:", compiPFP.address);
+
 }
 
 // We recommend this pattern to be able to use async/await everywhere

@@ -49,6 +49,8 @@ contract CompicactusPFP is
 
     string private _baseTokenURI;
 
+    string private _contractURI;
+
     /**
      * @dev Grants `DEFAULT_ADMIN_ROLE`, `MINTER_ROLE` and `PAUSER_ROLE` to the
      * account that deploys the contract.
@@ -102,7 +104,7 @@ contract CompicactusPFP is
      * - the caller must have the `MINTER_ROLE`.
      */
     function mint(address to) public virtual {
-        require(hasRole(MINTER_ROLE, _msgSender()), "ERC721PresetMinterPauserAutoId: must have minter role to mint");
+        require(hasRole(MINTER_ROLE, _msgSender()), "CompicactusPFP: must have minter role to mint");
 
         // We cannot just use balanceOf to create the new tokenId because tokens
         // can be burned (destroyed), so we need a separate counter.
@@ -120,7 +122,7 @@ contract CompicactusPFP is
      * - the caller must have the `PAUSER_ROLE`.
      */
     function pause() public virtual {
-        require(hasRole(PAUSER_ROLE, _msgSender()), "ERC721PresetMinterPauserAutoId: must have pauser role to pause");
+        require(hasRole(PAUSER_ROLE, _msgSender()), "CompicactusPFP: must have pauser role to pause");
         _pause();
     }
 
@@ -134,7 +136,7 @@ contract CompicactusPFP is
      * - the caller must have the `PAUSER_ROLE`.
      */
     function unpause() public virtual {
-        require(hasRole(PAUSER_ROLE, _msgSender()), "ERC721PresetMinterPauserAutoId: must have pauser role to unpause");
+        require(hasRole(PAUSER_ROLE, _msgSender()), "CompicactusPFP: must have pauser role to unpause");
         _unpause();
     }
 
@@ -159,4 +161,35 @@ contract CompicactusPFP is
         return super.supportsInterface(interfaceId);
     }
     uint256[48] private __gap;
+
+
+    /* Addons */
+
+    /**
+    * @dev Get the URL to a JSON file with contract metadata for OpenSea.
+    */
+    function contractURI() public view returns (string memory) {
+        return _contractURI;
+    }
+
+    /**
+    * @dev Set the URL to a JSON file with contract metadata for OpenSea.
+    * @param __contractURI - an URL to the metadata
+    */
+    function setContractURI(string memory __contractURI) public {
+        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "CompicactusPFP: must have admin role to change contract uri");
+
+        _contractURI = __contractURI;
+
+        emit ContractURISet(__contractURI);
+    }
+
+
+    /* EVENTS */
+
+    /**
+    * @dev Emits when the contract URI is set
+    * @param contractURI - an URL to the metadata
+    */
+    event ContractURISet(string contractURI);
 }

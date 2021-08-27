@@ -2,20 +2,41 @@ const { expect } = require("chai");
 const { ethers, upgrades } = require("hardhat");
 
 describe("Greeter", function () {
-  it("Should return the new greeting once it's changed", async function () {
-    const CompicactusPFP = await ethers.getContractFactory("CompicactusPFP");
-    const compicactusPFP = await upgrades.deployProxy(CompicactusPFP, ["CompicactusPFP", "CPFP", "ipfs://baseUri"]);
-    await compicactusPFP.deployed();
+    let compicactusPFP;
+    let accounts;
 
-    /*
-    expect(await compicactusPFP.greet()).to.equal("Hello, world!");
+    it("Should return the new greeting once it's changed", async function () {
+        const CompicactusPFP = await ethers.getContractFactory("CompicactusPFP");
+        compicactusPFP = await upgrades.deployProxy(CompicactusPFP, ["CompicactusPFP", "CPFP", "ipfs://baseUri"]);
+        await compicactusPFP.deployed();
 
-    const setGreetingTx = await compicactusPFP.setGreeting("Hola, mundo!");
+        accounts = await hre.ethers.getSigners();
+    });
 
-    // wait until the transaction is mined
-    await setGreetingTx.wait();
+    it("Should return the contractURI", async function () {
 
-    expect(await compicactusPFP.greet()).to.equal("Hola, mundo!");
-    */
-  });
+        const setContractURITx = await compicactusPFP.setContractURI("ipfs://contract.json");
+
+        await setContractURITx.wait();
+
+        expect(await compicactusPFP.contractURI()).to.equal("ipfs://contract.json");
+
+    });
+
+    it("Mints", async function () {
+        const setMintTx = await compicactusPFP.mint(accounts[0].address);
+
+        await setMintTx.wait();
+
+        const setMint2Tx = await compicactusPFP.mint(accounts[1].address);
+
+        await setMint2Tx.wait();
+    });
+
+    it("Prevents mint for non minters", async function () {
+
+        const setMintTx = compicactusPFP.connect(accounts[1]).mint(accounts[1].address);
+
+        await expect(setMintTx).to.be.revertedWith('CompicactusPFP: must have minter role to mint');
+    });
 });
