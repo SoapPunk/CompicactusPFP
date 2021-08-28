@@ -86,6 +86,8 @@ contract CompicactusPFP is
 
         _setupRole(MINTER_ROLE, _msgSender());
         _setupRole(PAUSER_ROLE, _msgSender());
+
+        _initializeEIP712(name);
     }
 
     function _baseURI() internal view virtual override returns (string memory) {
