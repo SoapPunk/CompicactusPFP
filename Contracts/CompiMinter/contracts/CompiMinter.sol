@@ -8,8 +8,8 @@ import "@openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgrad
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 
 import "@openzeppelin/contracts-upgradeable/token/ERC721/presets/ERC721PresetMinterPauserAutoIdUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol";
+//import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC1155/presets/ERC1155PresetMinterPauserUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/presets/ERC20PresetMinterPauserUpgradeable.sol";
 
 import {NativeMetaTransaction} from "./NativeMetaTransaction.sol";
@@ -41,29 +41,43 @@ contract CompiMinter is
 
     uint8 private _maxMintByAccount;
 
+    uint256 private _startTime;
+
     uint256 private _endTime;
 
     uint256 private _multPrice;
 
+    uint32 private _totalTokenAmount;
 
-    function initialize(address[] memory discountTokens, bool[] memory discountTokensIsERC1155, string memory domainSeparator) public initializer {
+    uint256 private _tokenCount;
+
+
+    function initialize(string memory domainSeparator) public initializer {
 
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
 
         _initializeEIP712(domainSeparator);
 
-        _discountTokens = discountTokens;
-
-        _discountTokensIsERC1155 = discountTokensIsERC1155;
-
         uint256 _startTime = block.timestamp;
-        setEndTime(_startTime.add(2592000));
+        setTimeWindow(_startTime, _startTime.add(2592000));
 
         setPrice(5000000000000000000);
 
         _maxMintByAccount = 2;
+
+        _totalTokenAmount = 12346;
     }
 
+    function setDiscountTokens(address[] memory discountTokens, bool[] memory discountTokensIsERC1155) public {
+        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "CompiMinter: must have admin role to set price");
+        require(discountTokens.length == discountTokensIsERC1155.length, "CompiMinter: array lengths must match");
+
+        _discountTokens = discountTokens;
+
+        _discountTokensIsERC1155 = discountTokensIsERC1155;
+
+        emit DiscountTokensSet(discountTokens, discountTokensIsERC1155);
+    }
 
     function setPrice(uint256 multPrice) public {
         require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "CompiMinter: must have admin role to set price");
@@ -74,12 +88,14 @@ contract CompiMinter is
     }
 
 
-    function setEndTime(uint256 endTime) public {
+    function setTimeWindow(uint256 startTime, uint256 endTime) public {
         require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "CompiMinter: must have admin role to change end time");
+
+        _startTime = startTime;
 
         _endTime = endTime;
 
-        emit EndTimeSet(endTime);
+        emit TimeWindowSet(startTime, endTime);
     }
 
 
@@ -109,12 +125,12 @@ contract CompiMinter is
         if (!_accountDiscountUsed[for_account]) {
             for(uint i = 0; i < _discountTokens.length; i++) {
                 if (_discountTokensIsERC1155[i]) {
-                    IERC1155Upgradeable _contract = IERC1155Upgradeable(_discountTokens[i]);
+                    ERC1155PresetMinterPauserUpgradeable _contract = ERC1155PresetMinterPauserUpgradeable(_discountTokens[i]);
                     if (_contract.balanceOf(for_account, 0)>0) {
                         willUseDiscount = true;
                     }
                 } else {
-                    IERC721Upgradeable _contract = IERC721Upgradeable(_discountTokens[i]);
+                    ERC721PresetMinterPauserAutoIdUpgradeable _contract = ERC721PresetMinterPauserAutoIdUpgradeable(_discountTokens[i]);
                     if (_contract.balanceOf(for_account)>0) {
                         willUseDiscount = true;
                     }
@@ -147,6 +163,18 @@ contract CompiMinter is
 
 
     /**
+    * @dev Is time window open?
+    */
+    function isWindowOpen() public view returns(bool use_discount) {
+        if (block.timestamp > _startTime && block.timestamp < _endTime){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    /**
     * @dev Mints a new Compi from an id.
     */
     function mintCompi()
@@ -154,8 +182,12 @@ contract CompiMinter is
         price(_getPrice())
     {
         require(!_tokenERC721.paused(), "CompiMinter: token mint while paused");
+        require(block.timestamp > _startTime, "CompiMinter: minting event not started");
         require(block.timestamp < _endTime, "CompiMinter: minting event ended");
+        require(_tokenCount < _totalTokenAmount, "CompiMinter: contract mint limit reached");
         require(_accountMintCount[_msgSender()] < _maxMintByAccount, "CompiMinter: max mints reached");
+
+        _tokenCount = _tokenCount.add(1);
 
         _accountMintCount[_msgSender()] += 1;
 
@@ -214,6 +246,13 @@ contract CompiMinter is
     event Withdraw(uint256 balance);
 
     /**
+    * @dev Emits when discount tokens are set
+    * @param discountTokens - array of ERC721 or ERC1155 address
+    * @param discountTokensIsERC1155 - array of boolean. True if token is ERC1155
+    */
+    event DiscountTokensSet(address[] discountTokens, bool[] discountTokensIsERC1155);
+
+    /**
     * @dev Emits when a new price is set
     * @param multPrice - a multiplier for the price
     */
@@ -226,10 +265,11 @@ contract CompiMinter is
     event ContractURISet(string contractURI);
 
     /**
-    * @dev Emits when the end time is set
+    * @dev Emits when the start and end time are set
+    * @param startTime - the event start time
     * @param endTime - the event end time
     */
-    event EndTimeSet(uint256 endTime);
+    event TimeWindowSet(uint256 startTime, uint256 endTime);
 
     /**
     * @dev Emits when the minting ERC721 contract address is set
