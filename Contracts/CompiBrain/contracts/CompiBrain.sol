@@ -38,10 +38,10 @@ contract CompiBrain is
     mapping (address => mapping (uint256 => mapping (string => string[]))) private _nftQuestions;
 
 
-    function initialize() public initializer {
+    function initialize(string memory domainSeparator) public initializer {
 
         _initializeEIP712(domainSeparator);
-        
+
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
     }
 

@@ -36,12 +36,14 @@ module.exports = {
         hardhat: {
         },
         mumbai: {
-            url: 'https://rpc-mumbai.maticvigil.com/v1/'+maticvigil,
+            //url: 'https://rpc-mumbai.maticvigil.com/v1/'+maticvigil,
+            url: 'https://matic-mumbai.chainstacklabs.com/',
             chainId: 80001,
             accounts: {
                 mnemonic: mnemonic,
 
-            }
+            },
+            gasPrice: 8000000000
         }
     }
 };

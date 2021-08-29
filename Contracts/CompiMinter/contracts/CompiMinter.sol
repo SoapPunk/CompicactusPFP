@@ -58,8 +58,7 @@ contract CompiMinter is
 
         _initializeEIP712(domainSeparator);
 
-        uint256 _startTime = block.timestamp;
-        setTimeWindow(_startTime, _startTime.add(2592000));
+        setTimeWindow(block.timestamp, block.timestamp.add(2592000));
 
         setPrice(5000000000000000000);
 
@@ -128,11 +127,13 @@ contract CompiMinter is
                     ERC1155PresetMinterPauserUpgradeable _contract = ERC1155PresetMinterPauserUpgradeable(_discountTokens[i]);
                     if (_contract.balanceOf(for_account, 0)>0) {
                         willUseDiscount = true;
+                        break;
                     }
                 } else {
                     ERC721PresetMinterPauserAutoIdUpgradeable _contract = ERC721PresetMinterPauserAutoIdUpgradeable(_discountTokens[i]);
                     if (_contract.balanceOf(for_account)>0) {
                         willUseDiscount = true;
+                        break;
                     }
                 }
             }
