@@ -7,11 +7,11 @@ describe("CompiBrain", function () {
 
     before(async function () {
         const CompiBrain = await ethers.getContractFactory("CompiBrain");
-        compibrain = await upgrades.deployProxy(CompiBrain, []);
+        compibrain = await upgrades.deployProxy(CompiBrain, ["CompiBrain"]);
         await compibrain.deployed();
 
-        const CompicactusPFP = await ethers.getContractFactory("CompicactusPFP");
-        compicactus_pfp = await upgrades.deployProxy(CompicactusPFP, ["CompicactusPFP", "CPFP", "https://"]);
+        const CompicactusPFP = await ethers.getContractFactory("ERC721PresetMinterPauserAutoIdUpgradeable");
+        compicactus_pfp = await upgrades.deployProxy(CompicactusPFP, ["ERC721", "ERC721", "https://"]);
         await compicactus_pfp.deployed();
 
         const accounts = await ethers.getSigners();
@@ -23,11 +23,13 @@ describe("CompiBrain", function () {
         await mint2Tx.wait();
     });
 
+
     it("Prevent add question for tokens owned by others", async function () {
         const addQuestionTx = compibrain.addQuestion(compicactus_pfp.address, 1, "test", "Hi", "Hi there!");
 
         await expect(addQuestionTx).to.be.revertedWith('CompiBrain: sender must be the owner of the token');
     });
+
 
     it("Adding questions", async function () {
         const addQuestionTx = await compibrain.addQuestion(compicactus_pfp.address, 0, "test", "Hi", "Hi there!");
@@ -39,6 +41,7 @@ describe("CompiBrain", function () {
         expect(answer).to.equal("Hi there!");
     });
 
+
     it("Getting questions", async function () {
 
         const answer = await compibrain.getQuestions(compicactus_pfp.address, 0, "test", 0);
@@ -49,6 +52,19 @@ describe("CompiBrain", function () {
 
         expect(answer2).to.equal(1);
     });
+
+
+    it("Getting scenes", async function () {
+
+        const answer = await compibrain.getScenes(compicactus_pfp.address, 0, 0);
+
+        expect(answer[0]).to.equal('test');
+
+        const answer2 = await compibrain.getScenesCount(compicactus_pfp.address, 0);
+
+        expect(answer2).to.equal(1);
+    });
+
 
     it("Getting questions with offset", async function () {
 
@@ -65,6 +81,7 @@ describe("CompiBrain", function () {
         expect(answer2).to.equal(2);
     });
 
+
     it("Muting questions", async function () {
         const muteQuestionTx = await compibrain.muteQuestion(compicactus_pfp.address, 0, "test", "Hi");
 
@@ -74,6 +91,7 @@ describe("CompiBrain", function () {
 
         expect(is_muted).to.equal(true);
     });
+
 
     it("Unmuting questions", async function () {
         const unmuteQuestionTx = await compibrain.unmuteQuestion(compicactus_pfp.address, 0, "test", "Hi");
@@ -126,5 +144,16 @@ describe("CompiBrain", function () {
         const name = await compibrain.getName(compicactus_pfp.address, 0);
 
         expect(name).to.equal("Felix");
+    });
+
+
+    it("Setting current scene", async function () {
+        const setCurrentSceneTx = await compibrain.setCurrentScene(compicactus_pfp.address, 0, "test");
+
+        await setCurrentSceneTx.wait();
+
+        const name = await compibrain.getCurrentScene(compicactus_pfp.address, 0);
+
+        expect(name).to.equal("test");
     });
 });
