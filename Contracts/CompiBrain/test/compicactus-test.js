@@ -27,7 +27,7 @@ describe("CompiBrain", function () {
     it("Prevent add question for tokens owned by others", async function () {
         const addQuestionTx = compibrain.addQuestion(compicactus_pfp.address, 1, "test", "Hi", "Hi there!");
 
-        await expect(addQuestionTx).to.be.revertedWith('CompiBrain: sender must be the owner of the token');
+        await expect(addQuestionTx).to.be.revertedWith('CompiBrain: sender must be the owner or operator of the token');
     });
 
 
@@ -82,25 +82,14 @@ describe("CompiBrain", function () {
     });
 
 
-    it("Muting questions", async function () {
-        const muteQuestionTx = await compibrain.muteQuestion(compicactus_pfp.address, 0, "test", "Hi");
+    it("Flag question", async function () {
+        const setFlagTx = await compibrain.setFlag(compicactus_pfp.address, 0, "NSFW");
 
-        await muteQuestionTx.wait();
+        await setFlagTx.wait();
 
-        const is_muted = await compibrain.isQuestionMuted(compicactus_pfp.address, 0, "test", "Hi");
+        const flags = await compibrain.getFlag(compicactus_pfp.address, 0);
 
-        expect(is_muted).to.equal(true);
-    });
-
-
-    it("Unmuting questions", async function () {
-        const unmuteQuestionTx = await compibrain.unmuteQuestion(compicactus_pfp.address, 0, "test", "Hi");
-
-        await unmuteQuestionTx.wait();
-
-        const is_muted = await compibrain.isQuestionMuted(compicactus_pfp.address, 0, "test", "Hi");
-
-        expect(is_muted).to.equal(false);
+        expect(flags).to.equal("NSFW");
     });
 
 
@@ -126,14 +115,14 @@ describe("CompiBrain", function () {
     it("Prevent remove question for tokens owned by others", async function () {
         const removeQuestionTx = compibrain.removeQuestion(compicactus_pfp.address, 1, "_", "_", 0);
 
-        await expect(removeQuestionTx).to.be.revertedWith('CompiBrain: sender must be the owner of the token');
+        await expect(removeQuestionTx).to.be.revertedWith('CompiBrain: sender must be the owner or operator of the token');
     });
 
 
     it("Prevent set name for tokens owned by others", async function () {
         const setNameTx = compibrain.setName(compicactus_pfp.address, 1, "Felix");
 
-        await expect(setNameTx).to.be.revertedWith('CompiBrain: sender must be the owner of the token');
+        await expect(setNameTx).to.be.revertedWith('CompiBrain: sender must be the owner or operator of the token');
     });
 
     it("Setting names", async function () {
@@ -147,12 +136,12 @@ describe("CompiBrain", function () {
     });
 
 
-    it("Setting current scene", async function () {
-        const setCurrentSceneTx = await compibrain.setCurrentScene(compicactus_pfp.address, 0, "test");
+    it("Setting initial scene", async function () {
+        const setInitialSceneTx = await compibrain.setInitialScene(compicactus_pfp.address, 0, "test");
 
-        await setCurrentSceneTx.wait();
+        await setInitialSceneTx.wait();
 
-        const name = await compibrain.getCurrentScene(compicactus_pfp.address, 0);
+        const name = await compibrain.getInitialScene(compicactus_pfp.address, 0);
 
         expect(name).to.equal("test");
     });
