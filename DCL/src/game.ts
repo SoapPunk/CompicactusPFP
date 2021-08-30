@@ -90,3 +90,39 @@ cubeCompiName.addComponent(
     })
 )
 engine.addEntity(cubeCompiName)
+
+const cubeCompiAddQuestion = new Entity()
+cubeCompiAddQuestion.addComponent(new Transform({ position: new Vector3(12, 2, 12) }))
+cubeCompiAddQuestion.addComponent(new BoxShape())
+cubeCompiAddQuestion.addComponent(
+    new OnPointerDown(async (e) => {
+        log("Setting compi name");
+
+        await blockchain.addQuestion(0, "default", "Hi compi!", "Hi there!").then(tx => {
+            log("addQuestion Ok ", tx)
+        }).catch(e => {
+            log("Error on addQuestion", e)
+        })
+
+    },
+    {
+        hoverText: "Add compi question",
+    })
+)
+engine.addEntity(cubeCompiAddQuestion)
+
+const cubeCompigGetAnswer = new Entity()
+cubeCompigGetAnswer.addComponent(new Transform({ position: new Vector3(12, 0.5, 12) }))
+cubeCompigGetAnswer.addComponent(new BoxShape())
+cubeCompigGetAnswer.addComponent(
+    new OnPointerDown(async (e) => {
+        log("Setting compi name");
+
+        const answer = await blockchain.getAnswer(0, "default", "Hi compi!")
+        log("answer", answer)
+    },
+    {
+        hoverText: "Get answer",
+    })
+)
+engine.addEntity(cubeCompigGetAnswer)
