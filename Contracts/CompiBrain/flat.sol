@@ -3815,7 +3815,6 @@ abstract contract ContextMixin {
 
 // File contracts/CompiBrain.sol
 
-
 pragma solidity ^0.8.0;
 
 
@@ -3845,12 +3844,61 @@ contract CompiBrain is
     // map[Contract][tokenId][Scene] = Questions[]
     mapping (address => mapping (uint256 => mapping (string => string[]))) private _nftQuestions;
 
+    // Mapping from token to list of Scenes
+    // map[Contract][tokenId] = Scenes[]
+    mapping (address => mapping (uint256 => string[])) private _nftScenes;
+
+    // Mapping from scene to if added
+    // map[scene] = boolean
+    mapping (string => bool) private _sceneAdded;
+
+    // Mapping from token to current Scene
+    // map[Contract][tokenId] = Scene
+    mapping (address => mapping (uint256 => string)) private _currentScene;
+
 
     function initialize(string memory domainSeparator) public initializer {
 
         _initializeEIP712(domainSeparator);
 
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
+    }
+
+
+    function getScenes(address _contract, uint256 id, uint256 offset) public view returns (string[] memory) {
+
+        string[] memory memoryArray = new string[](10);
+
+        uint8 memi = 0;
+        for(uint256 i = offset; i < _nftScenes[_contract][id].length; i++) {
+            if (i > offset+10) break;
+            memoryArray[memi] = _nftScenes[_contract][id][i];
+            memi++;
+        }
+
+        return memoryArray;
+    }
+
+
+    function getScenesCount(address _contract, uint256 id) public view returns (uint256) {
+        return _nftScenes[_contract][id].length;
+    }
+
+
+    function setCurrentScene(address _contract, uint256 id, string memory scene) public {
+        ERC721Upgradeable _erc721 = ERC721Upgradeable(_contract);
+        bool is_owner = _erc721.ownerOf(id) == _msgSender();
+        require(is_owner, "CompiBrain: sender must be the owner of the token");
+
+        _currentScene[_contract][id] = scene;
+
+        emit currentSceneSet(_contract, id, scene);
+    }
+
+
+    function getCurrentScene(address _contract, uint256 id) public view returns (string memory) {
+
+        return _currentScene[_contract][id];
     }
 
 
@@ -3866,6 +3914,11 @@ contract CompiBrain is
         }
 
         _nftQuestionAnswer[_contract][id][scene][question] = answer;
+
+        if (!_sceneAdded[scene]) {
+            _sceneAdded[scene] = true;
+            _nftScenes[_contract][id].push(scene);
+        }
 
         emit QuestionAdded(_contract, id, scene, question, answer);
     }
@@ -3902,14 +3955,14 @@ contract CompiBrain is
         return memoryArray;
     }
 
+    function getQuestionsCount(address _contract, uint256 id, string memory scene) public view returns (uint256) {
+        return _nftQuestions[_contract][id][scene].length;
+    }
+
 
     function getAnswer(address _contract, uint256 id, string memory scene, string memory question) public view returns (string memory) {
 
         return _nftQuestionAnswer[_contract][id][scene][question];
-    }
-
-    function getQuestionsCount(address _contract, uint256 id, string memory scene) public view returns (uint256) {
-        return _nftQuestions[_contract][id][scene].length;
     }
 
     function muteQuestion(address _contract, uint256 id, string memory scene, string memory question) public {
@@ -4000,6 +4053,14 @@ contract CompiBrain is
     * @param name - Name of the token
     */
     event nameSet(address _contract, uint256 id, string name);
+
+    /**
+    * @dev Emits when the owner sets current scene
+    * @param _contract - ERC721 contract address
+    * @param id - Id of the ERC721 token
+    * @param scene - Name of the scene
+    */
+    event currentSceneSet(address _contract, uint256 id, string scene);
 
 
     // This is to support Native meta transactions

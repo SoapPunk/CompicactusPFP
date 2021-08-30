@@ -74,7 +74,7 @@ export const contracts = {
         mumbai: {
             version: '1',
             abi: abiBrain,
-            address: '0x7AE2Aa90d329bf5A27e71a0E41EedcC6C0b43397',
+            address: '0x3435e99eE13D10B19DCc4e0Ef150b3f823f18c67',
             name: 'CompiBrain',
             chainId: 80001
         }
