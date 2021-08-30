@@ -99,13 +99,11 @@ contract CompiBrain is
     }
 
 
-    function addQuestion(address _contract, uint256 id, string memory scene, string memory question, string memory answer)
-        public
-        isOwnerOrOperator(_contract, id)
+    function _addQuestion(address _contract, uint256 id, string memory scene, string memory question, string memory answer)
+        private
     {
 
         if (keccak256(bytes(_nftQuestionAnswer[_contract][id][scene][question])) == keccak256(bytes(""))) {
-            console.log("Adding question");
             _nftQuestions[_contract][id][scene].push(question);
         }
 
@@ -117,6 +115,27 @@ contract CompiBrain is
         }
 
         emit QuestionAdded(_contract, id, scene, question, answer);
+    }
+
+
+    function addQuestion(address _contract, uint256 id, string memory scene, string memory question, string memory answer)
+        public
+        isOwnerOrOperator(_contract, id)
+    {
+
+        _addQuestion(_contract, id, scene, question, answer);
+    }
+
+
+    function addQuestionBatch(address _contract, uint256 id, string memory scene, string[] memory questions, string[] memory answers)
+        public
+        isOwnerOrOperator(_contract, id)
+    {
+        require(questions.length == answers.length, "CompiBrain: array lengths must match");
+
+        for(uint i = 0; i < questions.length; i++) {
+            _addQuestion(_contract, id, scene, questions[i], answers[i]);
+        }
     }
 
 
@@ -150,6 +169,7 @@ contract CompiBrain is
         return memoryArray;
     }
 
+
     function getQuestionsCount(address _contract, uint256 id, string memory scene) public view returns (uint256) {
         return _nftQuestions[_contract][id][scene].length;
     }
@@ -159,6 +179,7 @@ contract CompiBrain is
 
         return _nftQuestionAnswer[_contract][id][scene][question];
     }
+
 
     function setFlag(address _contract, uint256 id, string memory flags) public {
         require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "CompiBrain: must have admin role to set flags");
@@ -172,6 +193,25 @@ contract CompiBrain is
     function getFlag(address _contract, uint256 id) public view returns (string memory) {
 
         return _nftFlag[_contract][id];
+    }
+
+
+    function setOperator(address _contract, uint256 id, address operator)
+        public
+    {
+        ERC721Upgradeable _erc721 = ERC721Upgradeable(_contract);
+        bool is_owner = _erc721.ownerOf(id) == _msgSender();
+        require(is_owner, "CompiBrain: sender must be the owner of the token");
+
+        _nftOperator[_contract][id] = operator;
+
+        emit OperatorSet(_contract, id, operator);
+    }
+
+
+    function getOperator(address _contract, uint256 id) public view returns (address) {
+
+        return _nftOperator[_contract][id];
     }
 
 
@@ -199,7 +239,7 @@ contract CompiBrain is
     */
     modifier isOwnerOrOperator(address _contract, uint256 id) {
         ERC721Upgradeable _erc721 = ERC721Upgradeable(_contract);
-        bool is_owner = _erc721.ownerOf(id) == _msgSender();
+        bool is_owner = _erc721.ownerOf(id) == _msgSender() || _nftOperator[_contract][id] == _msgSender();
         require(is_owner, "CompiBrain: sender must be the owner or operator of the token");
 
         _;
@@ -235,6 +275,14 @@ contract CompiBrain is
     * @param flags - A string with flags
     */
     event FlagSet(address _contract, uint256 id, string flags);
+
+    /**
+    * @dev Emits when an operator is set
+    * @param _contract - ERC721 contract address
+    * @param id - Id of the ERC721 token
+    * @param operator - Operator's address
+    */
+    event OperatorSet(address _contract, uint256 id, address operator);
 
     /**
     * @dev Emits when the owner names the token

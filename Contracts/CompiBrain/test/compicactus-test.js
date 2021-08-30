@@ -4,6 +4,7 @@ const { ethers, upgrades } = require("hardhat");
 describe("CompiBrain", function () {
     let compibrain;
     let compicactus_pfp;
+    let accounts;
 
     before(async function () {
         const CompiBrain = await ethers.getContractFactory("CompiBrain");
@@ -14,7 +15,7 @@ describe("CompiBrain", function () {
         compicactus_pfp = await upgrades.deployProxy(CompicactusPFP, ["ERC721", "ERC721", "https://"]);
         await compicactus_pfp.deployed();
 
-        const accounts = await ethers.getSigners();
+        accounts = await ethers.getSigners();
 
         const mintTx = await compicactus_pfp.mint(accounts[0].address);
         await mintTx.wait();
@@ -144,5 +145,52 @@ describe("CompiBrain", function () {
         const name = await compibrain.getInitialScene(compicactus_pfp.address, 0);
 
         expect(name).to.equal("test");
+    });
+
+
+    it("Setting operator", async function () {
+        const setOperatorTx = await compibrain.setOperator(compicactus_pfp.address, 0, accounts[2].address);
+
+        await setOperatorTx.wait();
+
+        const address = await compibrain.getOperator(compicactus_pfp.address, 0);
+
+        expect(address).to.equal(accounts[2].address);
+    });
+
+
+    it("Operator can't set operator", async function () {
+        const setOperatorTx = compibrain.connect(accounts[2]).setOperator(compicactus_pfp.address, 0, accounts[2].address);
+
+        await expect(setOperatorTx).to.be.revertedWith('CompiBrain: sender must be the owner of the token');
+    });
+
+
+    it("Allow if operator", async function () {
+        const setInitialSceneTx = await compibrain.connect(accounts[2]).setInitialScene(compicactus_pfp.address, 0, "test2");
+
+        await setInitialSceneTx.wait();
+
+        const name = await compibrain.getInitialScene(compicactus_pfp.address, 0);
+
+        expect(name).to.equal("test2");
+    });
+
+
+    it("Prevent adding questions in batch with wrong length", async function () {
+        const addQuestionBatchTx = compibrain.addQuestionBatch(compicactus_pfp.address, 0, "test", ["1", "2"], ["1!"]);
+
+        await expect(addQuestionBatchTx).to.be.revertedWith('CompiBrain: array lengths must match');
+    });
+
+
+    it("Adding questions in batch", async function () {
+        const addQuestionBatchTx = await compibrain.addQuestionBatch(compicactus_pfp.address, 0, "test", ["1", "2"], ["1!", "2!"]);
+
+        await addQuestionBatchTx.wait();
+
+        const answer = await compibrain.getAnswer(compicactus_pfp.address, 0, "test", "2");
+
+        expect(answer).to.equal("2!");
     });
 });
