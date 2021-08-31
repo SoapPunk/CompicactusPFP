@@ -25,49 +25,124 @@ contract CompiBrain is
     // map[Contract][tokenId][Scene][Question] = Answer
     mapping (address => mapping (uint256 => mapping (string => mapping (string => string)))) private _nftQuestionAnswer;
 
-    // Mapping from token to muted boolean
-    // map[Contract][tokenId][Scene][Question] = Boolean
-    mapping (address => mapping (uint256 => mapping (string => mapping (string => bool)))) private _nftQuestionMuted;
+    // Mapping from token to flags
+    // map[Contract][tokenId] = String
+    mapping (address => mapping (uint256 => string)) private _nftFlag;
 
     // Mapping from token to name
     // map[Contract][tokenId] = Name
     mapping (address => mapping (uint256 => string)) private _nftName;
 
+    // Mapping from token to Operator
+    // map[Contract][tokenId] = Address
+    mapping (address => mapping (uint256 => address)) private _nftOperator;
+
     // Mapping from token to list of questions
     // map[Contract][tokenId][Scene] = Questions[]
     mapping (address => mapping (uint256 => mapping (string => string[]))) private _nftQuestions;
 
+    // Mapping from token to list of Scenes
+    // map[Contract][tokenId] = Scenes[]
+    mapping (address => mapping (uint256 => string[])) private _nftScenes;
 
-    function initialize() public initializer {
+    // Mapping from scene to if added
+    // map[scene] = boolean
+    mapping (string => bool) private _sceneAdded;
+
+    // Mapping from token to current Scene
+    // map[Contract][tokenId] = Scene
+    mapping (address => mapping (uint256 => string)) private _initialScene;
+
+
+    function initialize(string memory domainSeparator) public initializer {
 
         _initializeEIP712(domainSeparator);
-        
+
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
     }
 
 
-    function addQuestion(address _contract, uint256 id, string memory scene, string memory question, string memory answer) public {
+    function getScenes(address _contract, uint256 id, uint256 offset) public view returns (string[] memory) {
 
-        ERC721Upgradeable _erc721 = ERC721Upgradeable(_contract);
-        bool is_owner = _erc721.ownerOf(id) == _msgSender();
-        require(is_owner, "CompiBrain: sender must be the owner of the token");
+        string[] memory memoryArray = new string[](10);
+
+        uint8 memi = 0;
+        for(uint256 i = offset; i < _nftScenes[_contract][id].length; i++) {
+            if (i > offset+10) break;
+            memoryArray[memi] = _nftScenes[_contract][id][i];
+            memi++;
+        }
+
+        return memoryArray;
+    }
+
+
+    function getScenesCount(address _contract, uint256 id) public view returns (uint256) {
+        return _nftScenes[_contract][id].length;
+    }
+
+
+    function setInitialScene(address _contract, uint256 id, string memory scene)
+        public
+        isOwnerOrOperator(_contract, id)
+    {
+
+        _initialScene[_contract][id] = scene;
+
+        emit InitialSceneSet(_contract, id, scene);
+    }
+
+
+    function getInitialScene(address _contract, uint256 id) public view returns (string memory) {
+
+        return _initialScene[_contract][id];
+    }
+
+
+    function _addQuestion(address _contract, uint256 id, string memory scene, string memory question, string memory answer)
+        private
+    {
 
         if (keccak256(bytes(_nftQuestionAnswer[_contract][id][scene][question])) == keccak256(bytes(""))) {
-            console.log("Adding question");
             _nftQuestions[_contract][id][scene].push(question);
         }
 
         _nftQuestionAnswer[_contract][id][scene][question] = answer;
 
+        if (!_sceneAdded[scene]) {
+            _sceneAdded[scene] = true;
+            _nftScenes[_contract][id].push(scene);
+        }
+
         emit QuestionAdded(_contract, id, scene, question, answer);
     }
 
 
-    function removeQuestion(address _contract, uint256 id, string memory scene, string memory question, uint256 questionId) public {
+    function addQuestion(address _contract, uint256 id, string memory scene, string memory question, string memory answer)
+        public
+        isOwnerOrOperator(_contract, id)
+    {
 
-        ERC721Upgradeable _erc721 = ERC721Upgradeable(_contract);
-        bool is_owner = _erc721.ownerOf(id) == _msgSender();
-        require(is_owner, "CompiBrain: sender must be the owner of the token");
+        _addQuestion(_contract, id, scene, question, answer);
+    }
+
+
+    function addQuestionBatch(address _contract, uint256 id, string memory scene, string[] memory questions, string[] memory answers)
+        public
+        isOwnerOrOperator(_contract, id)
+    {
+        require(questions.length == answers.length, "CompiBrain: array lengths must match");
+
+        for(uint i = 0; i < questions.length; i++) {
+            _addQuestion(_contract, id, scene, questions[i], answers[i]);
+        }
+    }
+
+
+    function removeQuestion(address _contract, uint256 id, string memory scene, string memory question, uint256 questionId)
+        public
+        isOwnerOrOperator(_contract, id)
+    {
 
         require(keccak256(bytes(_nftQuestions[_contract][id][scene][questionId])) == keccak256(bytes(question)), "CompiBrain: questionId is not pointing to the expected question");
 
@@ -95,53 +170,79 @@ contract CompiBrain is
     }
 
 
+    function getQuestionsCount(address _contract, uint256 id, string memory scene) public view returns (uint256) {
+        return _nftQuestions[_contract][id][scene].length;
+    }
+
+
     function getAnswer(address _contract, uint256 id, string memory scene, string memory question) public view returns (string memory) {
 
         return _nftQuestionAnswer[_contract][id][scene][question];
     }
 
-    function getQuestionsCount(address _contract, uint256 id, string memory scene) public view returns (uint256) {
-        return _nftQuestions[_contract][id][scene].length;
-    }
 
-    function muteQuestion(address _contract, uint256 id, string memory scene, string memory question) public {
-        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "CompiBrain: must have admin role to mute question");
+    function setFlag(address _contract, uint256 id, string memory flags) public {
+        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "CompiBrain: must have admin role to set flags");
 
-        _nftQuestionMuted[_contract][id][scene][question] = true;
+        _nftFlag[_contract][id] = flags;
 
-        emit QuestionMuted(_contract, id, scene, question);
+        emit FlagSet(_contract, id, flags);
     }
 
 
-    function unmuteQuestion(address _contract, uint256 id, string memory scene, string memory question) public {
-        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "CompiBrain: must have admin role to unmute question");
+    function getFlag(address _contract, uint256 id) public view returns (string memory) {
 
-        _nftQuestionMuted[_contract][id][scene][question] = false;
-
-        emit QuestionUnmuted(_contract, id, scene, question);
+        return _nftFlag[_contract][id];
     }
 
 
-    function isQuestionMuted(address _contract, uint256 id, string memory scene, string memory question) public view returns (bool) {
-
-        return _nftQuestionMuted[_contract][id][scene][question];
-    }
-
-
-    function setName(address _contract, uint256 id, string memory name) public {
+    function setOperator(address _contract, uint256 id, address operator)
+        public
+    {
         ERC721Upgradeable _erc721 = ERC721Upgradeable(_contract);
         bool is_owner = _erc721.ownerOf(id) == _msgSender();
         require(is_owner, "CompiBrain: sender must be the owner of the token");
 
+        _nftOperator[_contract][id] = operator;
+
+        emit OperatorSet(_contract, id, operator);
+    }
+
+
+    function getOperator(address _contract, uint256 id) public view returns (address) {
+
+        return _nftOperator[_contract][id];
+    }
+
+
+    function setName(address _contract, uint256 id, string memory name)
+        public
+        isOwnerOrOperator(_contract, id)
+    {
+
         _nftName[_contract][id] = name;
 
-        emit nameSet(_contract, id, name);
+        emit NameSet(_contract, id, name);
     }
 
 
     function getName(address _contract, uint256 id) public view returns (string memory) {
 
         return _nftName[_contract][id];
+    }
+
+
+    /**
+    * @dev modifier to check if sender is owner or operator
+    * @param _contract - token contract
+    * @param id - token id
+    */
+    modifier isOwnerOrOperator(address _contract, uint256 id) {
+        ERC721Upgradeable _erc721 = ERC721Upgradeable(_contract);
+        bool is_owner = _erc721.ownerOf(id) == _msgSender() || _nftOperator[_contract][id] == _msgSender();
+        require(is_owner, "CompiBrain: sender must be the owner or operator of the token");
+
+        _;
     }
 
 
@@ -168,22 +269,20 @@ contract CompiBrain is
     event QuestionRemoved(address _contract, uint256 id, string scene, string question, uint256 questionId);
 
     /**
-    * @dev Emits when an admin mute a question
+    * @dev Emits when an admin flags a NFT
     * @param _contract - ERC721 contract address
     * @param id - Id of the ERC721 token
-    * @param scene - Unique name of the scene
-    * @param question - Unique question
+    * @param flags - A string with flags
     */
-    event QuestionMuted(address _contract, uint256 id, string scene, string question);
+    event FlagSet(address _contract, uint256 id, string flags);
 
     /**
-    * @dev Emits when an admin unmute a question
+    * @dev Emits when an operator is set
     * @param _contract - ERC721 contract address
     * @param id - Id of the ERC721 token
-    * @param scene - Unique name of the scene
-    * @param question - Unique question
+    * @param operator - Operator's address
     */
-    event QuestionUnmuted(address _contract, uint256 id, string scene, string question);
+    event OperatorSet(address _contract, uint256 id, address operator);
 
     /**
     * @dev Emits when the owner names the token
@@ -191,7 +290,15 @@ contract CompiBrain is
     * @param id - Id of the ERC721 token
     * @param name - Name of the token
     */
-    event nameSet(address _contract, uint256 id, string name);
+    event NameSet(address _contract, uint256 id, string name);
+
+    /**
+    * @dev Emits when the owner sets current scene
+    * @param _contract - ERC721 contract address
+    * @param id - Id of the ERC721 token
+    * @param scene - Name of the scene
+    */
+    event InitialSceneSet(address _contract, uint256 id, string scene);
 
 
     // This is to support Native meta transactions

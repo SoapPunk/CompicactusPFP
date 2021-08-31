@@ -4,17 +4,18 @@ const { ethers, upgrades } = require("hardhat");
 describe("CompiBrain", function () {
     let compibrain;
     let compicactus_pfp;
+    let accounts;
 
     before(async function () {
         const CompiBrain = await ethers.getContractFactory("CompiBrain");
-        compibrain = await upgrades.deployProxy(CompiBrain, []);
+        compibrain = await upgrades.deployProxy(CompiBrain, ["CompiBrain"]);
         await compibrain.deployed();
 
-        const CompicactusPFP = await ethers.getContractFactory("CompicactusPFP");
-        compicactus_pfp = await upgrades.deployProxy(CompicactusPFP, ["CompicactusPFP", "CPFP", "https://"]);
+        const CompicactusPFP = await ethers.getContractFactory("ERC721PresetMinterPauserAutoIdUpgradeable");
+        compicactus_pfp = await upgrades.deployProxy(CompicactusPFP, ["ERC721", "ERC721", "https://"]);
         await compicactus_pfp.deployed();
 
-        const accounts = await ethers.getSigners();
+        accounts = await ethers.getSigners();
 
         const mintTx = await compicactus_pfp.mint(accounts[0].address);
         await mintTx.wait();
@@ -23,11 +24,13 @@ describe("CompiBrain", function () {
         await mint2Tx.wait();
     });
 
+
     it("Prevent add question for tokens owned by others", async function () {
         const addQuestionTx = compibrain.addQuestion(compicactus_pfp.address, 1, "test", "Hi", "Hi there!");
 
-        await expect(addQuestionTx).to.be.revertedWith('CompiBrain: sender must be the owner of the token');
+        await expect(addQuestionTx).to.be.revertedWith('CompiBrain: sender must be the owner or operator of the token');
     });
+
 
     it("Adding questions", async function () {
         const addQuestionTx = await compibrain.addQuestion(compicactus_pfp.address, 0, "test", "Hi", "Hi there!");
@@ -39,6 +42,7 @@ describe("CompiBrain", function () {
         expect(answer).to.equal("Hi there!");
     });
 
+
     it("Getting questions", async function () {
 
         const answer = await compibrain.getQuestions(compicactus_pfp.address, 0, "test", 0);
@@ -49,6 +53,19 @@ describe("CompiBrain", function () {
 
         expect(answer2).to.equal(1);
     });
+
+
+    it("Getting scenes", async function () {
+
+        const answer = await compibrain.getScenes(compicactus_pfp.address, 0, 0);
+
+        expect(answer[0]).to.equal('test');
+
+        const answer2 = await compibrain.getScenesCount(compicactus_pfp.address, 0);
+
+        expect(answer2).to.equal(1);
+    });
+
 
     it("Getting questions with offset", async function () {
 
@@ -65,24 +82,15 @@ describe("CompiBrain", function () {
         expect(answer2).to.equal(2);
     });
 
-    it("Muting questions", async function () {
-        const muteQuestionTx = await compibrain.muteQuestion(compicactus_pfp.address, 0, "test", "Hi");
 
-        await muteQuestionTx.wait();
+    it("Flag question", async function () {
+        const setFlagTx = await compibrain.setFlag(compicactus_pfp.address, 0, "NSFW");
 
-        const is_muted = await compibrain.isQuestionMuted(compicactus_pfp.address, 0, "test", "Hi");
+        await setFlagTx.wait();
 
-        expect(is_muted).to.equal(true);
-    });
+        const flags = await compibrain.getFlag(compicactus_pfp.address, 0);
 
-    it("Unmuting questions", async function () {
-        const unmuteQuestionTx = await compibrain.unmuteQuestion(compicactus_pfp.address, 0, "test", "Hi");
-
-        await unmuteQuestionTx.wait();
-
-        const is_muted = await compibrain.isQuestionMuted(compicactus_pfp.address, 0, "test", "Hi");
-
-        expect(is_muted).to.equal(false);
+        expect(flags).to.equal("NSFW");
     });
 
 
@@ -108,14 +116,14 @@ describe("CompiBrain", function () {
     it("Prevent remove question for tokens owned by others", async function () {
         const removeQuestionTx = compibrain.removeQuestion(compicactus_pfp.address, 1, "_", "_", 0);
 
-        await expect(removeQuestionTx).to.be.revertedWith('CompiBrain: sender must be the owner of the token');
+        await expect(removeQuestionTx).to.be.revertedWith('CompiBrain: sender must be the owner or operator of the token');
     });
 
 
     it("Prevent set name for tokens owned by others", async function () {
         const setNameTx = compibrain.setName(compicactus_pfp.address, 1, "Felix");
 
-        await expect(setNameTx).to.be.revertedWith('CompiBrain: sender must be the owner of the token');
+        await expect(setNameTx).to.be.revertedWith('CompiBrain: sender must be the owner or operator of the token');
     });
 
     it("Setting names", async function () {
@@ -126,5 +134,63 @@ describe("CompiBrain", function () {
         const name = await compibrain.getName(compicactus_pfp.address, 0);
 
         expect(name).to.equal("Felix");
+    });
+
+
+    it("Setting initial scene", async function () {
+        const setInitialSceneTx = await compibrain.setInitialScene(compicactus_pfp.address, 0, "test");
+
+        await setInitialSceneTx.wait();
+
+        const name = await compibrain.getInitialScene(compicactus_pfp.address, 0);
+
+        expect(name).to.equal("test");
+    });
+
+
+    it("Setting operator", async function () {
+        const setOperatorTx = await compibrain.setOperator(compicactus_pfp.address, 0, accounts[2].address);
+
+        await setOperatorTx.wait();
+
+        const address = await compibrain.getOperator(compicactus_pfp.address, 0);
+
+        expect(address).to.equal(accounts[2].address);
+    });
+
+
+    it("Operator can't set operator", async function () {
+        const setOperatorTx = compibrain.connect(accounts[2]).setOperator(compicactus_pfp.address, 0, accounts[2].address);
+
+        await expect(setOperatorTx).to.be.revertedWith('CompiBrain: sender must be the owner of the token');
+    });
+
+
+    it("Allow if operator", async function () {
+        const setInitialSceneTx = await compibrain.connect(accounts[2]).setInitialScene(compicactus_pfp.address, 0, "test2");
+
+        await setInitialSceneTx.wait();
+
+        const name = await compibrain.getInitialScene(compicactus_pfp.address, 0);
+
+        expect(name).to.equal("test2");
+    });
+
+
+    it("Prevent adding questions in batch with wrong length", async function () {
+        const addQuestionBatchTx = compibrain.addQuestionBatch(compicactus_pfp.address, 0, "test", ["1", "2"], ["1!"]);
+
+        await expect(addQuestionBatchTx).to.be.revertedWith('CompiBrain: array lengths must match');
+    });
+
+
+    it("Adding questions in batch", async function () {
+        const addQuestionBatchTx = await compibrain.addQuestionBatch(compicactus_pfp.address, 0, "test", ["1", "2"], ["1!", "2!"]);
+
+        await addQuestionBatchTx.wait();
+
+        const answer = await compibrain.getAnswer(compicactus_pfp.address, 0, "test", "2");
+
+        expect(answer).to.equal("2!");
     });
 });

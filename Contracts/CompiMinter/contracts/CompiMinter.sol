@@ -58,8 +58,7 @@ contract CompiMinter is
 
         _initializeEIP712(domainSeparator);
 
-        uint256 _startTime = block.timestamp;
-        setTimeWindow(_startTime, _startTime.add(2592000));
+        setTimeWindow(block.timestamp, block.timestamp.add(2592000));
 
         setPrice(5000000000000000000);
 
@@ -128,11 +127,13 @@ contract CompiMinter is
                     ERC1155PresetMinterPauserUpgradeable _contract = ERC1155PresetMinterPauserUpgradeable(_discountTokens[i]);
                     if (_contract.balanceOf(for_account, 0)>0) {
                         willUseDiscount = true;
+                        break;
                     }
                 } else {
                     ERC721PresetMinterPauserAutoIdUpgradeable _contract = ERC721PresetMinterPauserAutoIdUpgradeable(_discountTokens[i]);
                     if (_contract.balanceOf(for_account)>0) {
                         willUseDiscount = true;
+                        break;
                     }
                 }
             }
@@ -177,9 +178,9 @@ contract CompiMinter is
     /**
     * @dev Mints a new Compi from an id.
     */
-    function mintCompi()
+    function mintCompi(uint256 maxPrice)
         external
-        price(_getPrice())
+        price(_getPrice(), maxPrice)
     {
         require(!_tokenERC721.paused(), "CompiMinter: token mint while paused");
         require(block.timestamp > _startTime, "CompiMinter: minting event not started");
@@ -214,7 +215,8 @@ contract CompiMinter is
     * This was dangerous before Solidity version 0.4.0, where it was possible to skip the part after `_;`.
     * @param _amount - ether needed to call the function
     */
-    modifier price(uint256 _amount) {
+    modifier price(uint256 _amount, uint256 maxPrice) {
+        require(maxPrice >= _amount, "CompiMinter: price exceedes maxPrice");
         require(_tokenERC20.balanceOf(_msgSender()) >= _amount, "CompiMinter: Not enough ERC20 tokens.");
         require(_tokenERC20.allowance(_msgSender(), address(this)) >= _amount, "CompiMinter: Not enough ERC20 token allowance.");
 

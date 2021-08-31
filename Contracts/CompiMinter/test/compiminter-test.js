@@ -101,14 +101,16 @@ describe("CompiMinter", function () {
     });
 
     it("Mint failing for lack of funds", async function () {
+        const price = await compiminter.getPrice(accounts[1].address);
 
         // Testing failing for lack of funds
-        const mintCompi_nofundsTx = compiminter.connect(accounts[1]).mintCompi();
+        const mintCompi_nofundsTx = compiminter.connect(accounts[1]).mintCompi(price[0]);
 
         await expect(mintCompi_nofundsTx).to.be.revertedWith('CompiMinter: Not enough ERC20 tokens.');
     });
 
     it("Mint failing for lack of approval", async function () {
+        const price = await compiminter.getPrice(accounts[1].address);
 
         // Minting erc20 to buy
         const mintTx = await erc20.mint(accounts[1].address, 1000);
@@ -116,7 +118,7 @@ describe("CompiMinter", function () {
         await mintTx.wait();
 
         // Testing failing for lack of approval
-        const mintCompi_noapprovalTx = compiminter.connect(accounts[1]).mintCompi();
+        const mintCompi_noapprovalTx = compiminter.connect(accounts[1]).mintCompi(price[0]);
 
         await expect(mintCompi_noapprovalTx).to.be.revertedWith('CompiMinter: Not enough ERC20 token allowance.');
 
@@ -131,8 +133,13 @@ describe("CompiMinter", function () {
 
         await approveTx.wait();
 
+        // Testing failing for lack of approval
+        const mintCompi_badpriceTx = compiminter.connect(accounts[1]).mintCompi('1');
+
+        await expect(mintCompi_badpriceTx).to.be.revertedWith('CompiMinter: price exceedes maxPrice');
+
         // Mint
-        const mintCompiTx = await compiminter.connect(accounts[1]).mintCompi();
+        const mintCompiTx = await compiminter.connect(accounts[1]).mintCompi(price[0]);
 
         await mintCompiTx.wait();
 

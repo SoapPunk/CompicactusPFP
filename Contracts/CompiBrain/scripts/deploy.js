@@ -15,21 +15,50 @@ async function main() {
 
   // We get the contract to deploy
 
-
-  //const Greeter = await hre.ethers.getContractFactory("Greeter");
-  //const greeter = await Greeter.deploy("Hello, Hardhat!");
-
-  //await greeter.deployed();
-
-  //console.log("Greeter deployed to:", greeter.address);
-
-
   const CompiBrain = await ethers.getContractFactory("CompiBrain");
-  const compibrain = await upgrades.deployProxy(CompiBrain, []);
+  const compibrain = await upgrades.deployProxy(CompiBrain, ["CompiBrain"]);
   await compibrain.deployed();
   console.log("CompiBrain deployed to:", compibrain.address);
 
+  console.log("Sleeping");
+  sleep(2000);
 
+  const ADMIN_ROLE = '0x0000000000000000000000000000000000000000000000000000000000000000';
+  const accounts = await ethers.getSigners();
+
+  const trueAdmin = '0xCF10CD8B5Dc2323B1eb6de6164647756BAd4dE4d';
+  const fakeAdmin = accounts[0].address;
+
+  console.log("Granting admin role");
+  const grantRoleTx = await compibrain.grantRole(ADMIN_ROLE, trueAdmin);
+  await grantRoleTx.wait();
+  console.log("Done");
+
+  console.log("Sleeping");
+  sleep(2000);
+
+  console.log("Revoke admin role");
+  const revokeRoleTx = await compibrain.revokeRole(ADMIN_ROLE, fakeAdmin);
+  await revokeRoleTx.wait();
+  console.log("Done");
+
+  console.log("Sleeping");
+  sleep(2000);
+
+  console.log("Transferring ownership of ProxyAdmin...");
+  // The owner of the ProxyAdmin can upgrade our contracts
+  await upgrades.admin.transferProxyAdminOwnership(trueAdmin);
+  console.log("Transferred ownership of ProxyAdmin to:", trueAdmin);
+
+}
+
+function sleep(milliseconds) {
+    var start = new Date().getTime();
+    for (var i = 0; i < 1e7; i++) {
+        if ((new Date().getTime() - start) > milliseconds) {
+            break;
+        }
+    }
 }
 
 // We recommend this pattern to be able to use async/await everywhere

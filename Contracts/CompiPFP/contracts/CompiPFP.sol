@@ -11,6 +11,9 @@ import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
+import {NativeMetaTransaction} from "./NativeMetaTransaction.sol";
+import {ContextMixin} from "./ContextMixin.sol";
+
 /**
  * @dev {ERC721} token, including:
  *
@@ -31,7 +34,9 @@ contract CompicactusPFP is
     AccessControlEnumerableUpgradeable,
     ERC721EnumerableUpgradeable,
     ERC721BurnableUpgradeable,
-    ERC721PausableUpgradeable
+    ERC721PausableUpgradeable,
+    NativeMetaTransaction,
+    ContextMixin
 {
     function initialize(
         string memory name,
