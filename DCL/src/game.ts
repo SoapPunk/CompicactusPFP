@@ -1,8 +1,8 @@
-import { Blockchain } from "./contracts"
+import { Stool } from "./stool"
 
-const blockchain = new Blockchain("mumbai")
+new Stool()
 
-
+/*
 const cubePrice = new Entity()
 cubePrice.addComponent(new Transform({ position: new Vector3(8, 2, 8) }))
 cubePrice.addComponent(new BoxShape())
@@ -126,3 +126,4 @@ cubeCompigGetAnswer.addComponent(
     })
 )
 engine.addEntity(cubeCompigGetAnswer)
+*/

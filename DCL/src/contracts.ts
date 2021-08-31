@@ -74,7 +74,7 @@ export const contracts = {
         mumbai: {
             version: '1',
             abi: abiBrain,
-            address: '0x3435e99eE13D10B19DCc4e0Ef150b3f823f18c67',
+            address: '0x308aF74242aFb7bC598Ff1ced52De1D3E6cb02d7',
             name: 'CompiBrain',
             chainId: 80001
         }
@@ -183,6 +183,19 @@ export class Blockchain {
     }
 
     // Mana
+    async balance() {
+        const publicKeyRequest = await executeTask(async () => {
+          const publicKey = await getUserPublicKey()
+          return publicKey
+        })
+
+        return this.getFactory(
+            this.mana_contract
+        ).then(async ( contract ) => {
+            return await contract.balanceOf(publicKeyRequest)
+        })
+    }
+
     async increaseAllowance(amount:String) {
         const functionApprove = new eth.SolidityFunction(this.getFunction("increaseAllowance", abiMANA));
         const amountValue = eth.toWei(amount, 'ether')
