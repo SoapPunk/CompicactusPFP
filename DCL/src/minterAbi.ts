@@ -467,7 +467,13 @@ export default [
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "maxPrice",
+        "type": "uint256"
+      }
+    ],
     "name": "mintCompi",
     "outputs": [],
     "stateMutability": "nonpayable",
