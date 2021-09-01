@@ -6175,9 +6175,9 @@ contract CompiMinter is
     /**
     * @dev Mints a new Compi from an id.
     */
-    function mintCompi()
+    function mintCompi(uint256 maxPrice)
         external
-        price(_getPrice())
+        price(_getPrice(), maxPrice)
     {
         require(!_tokenERC721.paused(), "CompiMinter: token mint while paused");
         require(block.timestamp > _startTime, "CompiMinter: minting event not started");
@@ -6212,7 +6212,8 @@ contract CompiMinter is
     * This was dangerous before Solidity version 0.4.0, where it was possible to skip the part after `_;`.
     * @param _amount - ether needed to call the function
     */
-    modifier price(uint256 _amount) {
+    modifier price(uint256 _amount, uint256 maxPrice) {
+        require(maxPrice >= _amount, "CompiMinter: price exceedes maxPrice");
         require(_tokenERC20.balanceOf(_msgSender()) >= _amount, "CompiMinter: Not enough ERC20 tokens.");
         require(_tokenERC20.allowance(_msgSender(), address(this)) >= _amount, "CompiMinter: Not enough ERC20 token allowance.");
 
