@@ -260,19 +260,29 @@ export class Blockchain {
         return this.prepareMetaTransaction(functionSignature, this.brain_contract).then().catch()
     }
 
-    async addQuestion(id:number, scene:string, question:string, answer:string) {
+    async addQuestion(id:number, question:string, answer:string) {
+        const scene = "default"
         const functionSsetQuestion = new eth.SolidityFunction(this.getFunction("addQuestion", abiBrain));
         const functionSignature = functionSsetQuestion.toPayload([this.pfp_contract.address, id, scene, question, answer]);
         log(functionSignature)
         return this.prepareMetaTransaction(functionSignature, this.brain_contract).then().catch()
     }
 
-    async getAnswer(id:number, scene:string, question:string) {
-
+    async getAnswer(id:number, question:string) {
+        const scene = "default"
         return this.getFactory(
             this.brain_contract
         ).then(async ( contract ) => {
             return await contract.getAnswer(this.pfp_contract.address, id, scene, question)
+        })
+    }
+
+    async getQuestions(id:number, offset:number) {
+        const scene = "default"
+        return this.getFactory(
+            this.brain_contract
+        ).then(async ( contract ) => {
+            return await contract.getQuestions(this.pfp_contract.address, id, scene, offset)
         })
     }
 

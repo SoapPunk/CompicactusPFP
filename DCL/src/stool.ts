@@ -1,5 +1,7 @@
 import { Blockchain } from "./contracts"
-import * as eth from "eth-connect";
+import { Mint } from "./mint"
+import { Teach } from "./teach"
+import * as eth from "eth-connect"
 
 //Menu Shapes
 const menu_mint_shape = new GLTFShape("models/menu_mint.gltf")
@@ -9,29 +11,17 @@ const menu_photo_shape = new GLTFShape("models/menu_photo.gltf")
 const menu_sell_shape = new GLTFShape("models/menu_sell.gltf")
 
 const stool_shape = new GLTFShape("models/stool.gltf")
-
-const mint_mint_shape = new GLTFShape("models/mint_mint.gltf")
-const mint_price_shape = new GLTFShape("models/mint_price.gltf")
-const mint_getpmana_shape = new GLTFShape("models/mint_getpmana.gltf")
-const mint_50off_shape = new GLTFShape("models/mint_50off.gltf")
-const price_shape = new TextShape()
+const compicactus_shape = new GLTFShape("models/Compicactus.glb")
 
 const sell_cargo_shape = new GLTFShape("models/sell_cargo.gltf")
 const sell_opensea_shape = new GLTFShape("models/sell_opensea.gltf")
 
-const setname_shape = new GLTFShape("models/setName.gltf")
-
 const left_shape = new GLTFShape("models/left.gltf")
 const right_shape = new GLTFShape("models/right.gltf")
 const compidata_shape = new TextShape()
+const answer_shape = new TextShape()
 
 const blockchain = new Blockchain("mumbai")
-
-
-const canvas = new UICanvas()
-
-const textInput = new UIInputText(canvas)
-
 
 
 export class Stool extends Entity {
@@ -41,27 +31,24 @@ export class Stool extends Entity {
     menu_teach_entity: Entity = new Entity
     menu_photo_entity: Entity = new Entity
     menu_sell_entity: Entity = new Entity
-
-    mint_mint_entity: Entity = new Entity
-    mint_price_entity: Entity = new Entity
-    mint_getpmana_entity: Entity = new Entity
-    mint_50off_entity: Entity = new Entity
+    compi_entity: Entity = new Entity
 
     sell_cargo_entity: Entity = new Entity
     sell_opensea_entity: Entity = new Entity
 
-    setname_entity: Entity = new Entity
-    price_entity: Entity = new Entity
-
     left_entity: Entity = new Entity
     right_entity: Entity = new Entity
     compidata_entity: Entity = new Entity
+    answer_entity: Entity = new Entity
 
-    current_price: [string, boolean] = ["0", false]
-    with_discount: boolean = false
     current_compi: number = -1
     current_token: number = -1
     current_menu: number = 0
+
+    mint: Mint
+    teach: Teach
+
+    compi_actions: Array<string>
 
     constructor() {
         super()
@@ -70,11 +57,12 @@ export class Stool extends Entity {
         this.addComponent(new Transform({
             position: new Vector3(8, 0, 8)
         }))
+        this.addComponent(new Billboard(false, true ,false))
         engine.addEntity(this)
 
-        this.setupMint()
+        this.mint = new Mint(this)
 
-        this.setupTeach()
+        this.teach = new Teach(this)
 
         this.setupSell()
 
@@ -100,104 +88,60 @@ export class Stool extends Entity {
             })
         )
 
-        compidata_shape.fontSize = 2
+        this.compi_entity.addComponent(compicactus_shape)
+        this.compi_entity.addComponent(new Transform({
+            position: new Vector3(0, 1.05, -0.1),
+            scale: new Vector3(0.3, 0.3, 0.3)
+        }))
+        this.compi_entity.setParent(this)
+
+        let animator = new Animator()
+        this.compi_entity.addComponent(animator)
+        this.compi_actions = [
+            "Action-01-Look R-L",
+            "Action-02-Look R",
+            "Action-03-Look L",
+            "Action-04-Look-Up",
+            "Action-05-Sleep",
+            "Action-06-Dancing",
+            "Action-07-Swinging",
+            "Action-08-LOL",
+            "Action-09-Pissed Off",
+            "Action-10-Yawn",
+            "Action-11-Alert",
+            "Action-02 Sigh",
+        ]
+        this.compi_actions.forEach(element => {
+            animator.addClip(new AnimationState(element))
+        })
+        engine.addEntity(this.compi_entity)
+
+        compidata_shape.fontSize = 1
         compidata_shape.value = "-"
         this.compidata_entity.addComponent(compidata_shape)
         this.compidata_entity.addComponent(new Transform({
-            position: new Vector3(0, 1.5, 0),
+            position: new Vector3(0, 1.1, 0),
             rotation: Quaternion.Euler(0, 180, 0)
         }))
         this.compidata_entity.setParent(this)
         engine.addEntity(this.compidata_entity)
 
-        textInput.width = "80%"
-        textInput.height = "25px"
-        textInput.vAlign = "bottom"
-        textInput.hAlign = "center"
-        textInput.fontSize = 10
-        textInput.placeholder = "Write name here"
-        textInput.placeholderColor = Color4.Gray()
-        textInput.positionY = "200px"
-        textInput.isPointerBlocker = true
-        textInput.visible = false
-
-        textInput.onTextSubmit = new OnTextSubmit(async (x) => {
-            textInput.visible = false
-            await blockchain.setName(this.current_token, x.text).then(tx => {
-                log("setName Ok ", tx)
-            }).catch(e => {
-                log("Error on setName", e)
-            })
-        })
-
+        answer_shape.fontSize = 2
+        answer_shape.value = "-"
+        answer_shape.color = Color3.Black()
+        answer_shape.outlineColor = Color3.White()
+        answer_shape.outlineWidth = .1
+        this.answer_entity.addComponent(answer_shape)
+        this.answer_entity.addComponent(new Transform({
+            position: new Vector3(0, 1.9, 0),
+            rotation: Quaternion.Euler(0, 180, 0)
+        }))
+        this.answer_entity.setParent(this)
+        engine.addEntity(this.answer_entity)
 
         this.setupMenu()
 
         this.ownsCompi()
-    }
-
-    setupMint() {
-        mint_mint_shape.visible = false
-        this.mint_mint_entity.addComponent(mint_mint_shape)
-        this.mint_mint_entity.addComponent(new Transform())
-        this.mint_mint_entity.setParent(this)
-        engine.addEntity(this.mint_mint_entity)
-        this.mint_mint_entity.addComponent(
-            new OnPointerDown(()=>{this.mint(this)},
-            {
-                hoverText: "Mint Compi",
-            })
-        )
-
-        mint_50off_shape.visible = false
-        this.mint_50off_entity.addComponent(mint_50off_shape)
-        this.mint_50off_entity.addComponent(new Transform())
-        this.mint_50off_entity.setParent(this)
-        engine.addEntity(this.mint_50off_entity)
-
-        mint_price_shape.visible = false
-        this.mint_price_entity.addComponent(mint_price_shape)
-        this.mint_price_entity.addComponent(new Transform())
-        this.mint_price_entity.setParent(this)
-        engine.addEntity(this.mint_price_entity)
-
-        mint_getpmana_shape.visible = false
-        this.mint_getpmana_entity.addComponent(mint_getpmana_shape)
-        this.mint_getpmana_entity.addComponent(new Transform())
-        this.mint_getpmana_entity.setParent(this)
-        engine.addEntity(this.mint_getpmana_entity)
-        this.mint_getpmana_entity.addComponent(
-            new OnPointerDown(() => {
-                openExternalURL("https://account.decentraland.org/")
-            },
-            {
-                hoverText: "Mint Compi",
-            })
-        )
-
-        price_shape.fontSize = 2
-        price_shape.visible = false
-        this.price_entity.addComponent(price_shape)
-        this.price_entity.addComponent(new Transform({
-            position: new Vector3(-.82, 1.76, 0.01),
-            rotation: Quaternion.Euler(0, 180, 0)
-        }))
-        this.price_entity.setParent(this)
-        engine.addEntity(this.price_entity)
-    }
-
-    setupTeach() {
-        setname_shape.visible = false
-        this.setname_entity.addComponent(setname_shape)
-        this.setname_entity.addComponent(new Transform())
-        this.setname_entity.setParent(this)
-        engine.addEntity(this.setname_entity)
-        this.setname_entity.addComponent(
-            new OnPointerDown(() => {this.setName(this)},
-            {
-                hoverText: "Set Name",
-            })
-        )
     }
 
     setupSell() {
@@ -213,6 +157,20 @@ export class Stool extends Entity {
             },
             {
                 hoverText: "Go to Cargo",
+            })
+        )
+
+        sell_opensea_shape.visible = false
+        this.sell_opensea_entity.addComponent(sell_opensea_shape)
+        this.sell_opensea_entity.addComponent(new Transform())
+        this.sell_opensea_entity.setParent(this)
+        engine.addEntity(this.sell_opensea_entity)
+        this.sell_opensea_entity.addComponent(
+            new OnPointerDown(() => {
+                openExternalURL("https://opensea.io/")
+            },
+            {
+                hoverText: "Go to OpenSea",
             })
         )
 
@@ -292,15 +250,12 @@ export class Stool extends Entity {
 
     updateMenu(){
         // Hide all
-        mint_mint_shape.visible = false
-        mint_price_shape.visible = false
-        mint_getpmana_shape.visible = false
-        mint_50off_shape.visible = false
-        price_shape.visible = false
+        this.mint.deactivate()
 
         sell_cargo_shape.visible = false
+        sell_opensea_shape.visible = false
 
-        setname_shape.visible = false
+        this.teach.deactivate()
 
         //Show all
         menu_mint_shape.visible = true
@@ -310,18 +265,14 @@ export class Stool extends Entity {
         menu_sell_shape.visible = true
 
         if (this.current_menu==0) {  // Mint
-            mint_mint_shape.visible = true
-            mint_price_shape.visible = true
-            mint_getpmana_shape.visible = true
-            mint_50off_shape.visible = true
-            price_shape.visible = true
+            this.mint.activate()
 
-            this.updatePrice()
+            this.mint.updatePrice()
 
         } else if (this.current_menu==1) {  // Chat
             //
         } else if (this.current_menu==2) {  // Teach
-            setname_shape.visible = true
+            this.teach.activate()
         } else if (this.current_menu==3) {  // Photo
             //menu_mint_shape.visible = false
             menu_chat_shape.visible = false
@@ -330,69 +281,8 @@ export class Stool extends Entity {
             menu_sell_shape.visible = false
         } else if (this.current_menu==4) {  // Sell
             sell_cargo_shape.visible = true
+            sell_opensea_shape.visible = true
         }
-    }
-
-    async updatePrice() {
-        const isWindowOpen = await blockchain.isWindowOpen()
-        if (!isWindowOpen) return
-
-        mint_50off_shape.visible = false
-
-        this.price_entity.getComponent(TextShape).value = "-"
-
-        log("Getting price")
-        const price = await blockchain.getPrice()
-        this.current_price = price
-        log("this.current_price", this.current_price)
-        const price_human = eth.fromWei(price[0].toString(), 'ether')
-        log("price_human", price_human)
-
-        if (price[1]) {
-            mint_50off_shape.visible = true
-        }
-
-        const balance = await blockchain.balance()
-        const balance_human = eth.fromWei(balance.toString(), 'ether')
-        log("balance", balance_human)
-
-        if (balance < price) {
-            engine.removeEntity(this.mint_mint_entity)
-            log("Not enough balance")
-        } else {
-            engine.addEntity(this.mint_mint_entity)
-            log("Enough balance")
-        }
-
-        this.price_entity.getComponent(TextShape).value = price_human
-    }
-
-    async mint(self: Stool) {
-        log("Minting");
-
-        log("price", self.current_price);
-
-        await blockchain.increaseAllowance(self.current_price[0]).then(tx => {
-            log("IncreaseAllowance Ok ", tx)
-            blockchain.mintCompi(self.current_price[0]).then(tx => {
-                log("Mint Ok ", tx)
-            }).catch(e => {
-                log("Error on mint", e)
-            })
-        }).catch(e => {
-            log("Error on IncreaseAllowance", e)
-        })
-
-    }
-
-    async setName(self:any) {
-        log("Set Name");
-        if (self.current_compi < 0) return
-
-        log("this.current_token", self.current_token);
-
-        textInput.visible = true
-
     }
 
     previous(self:any) {
@@ -451,5 +341,6 @@ export class Stool extends Entity {
 
         compidata_shape.value = compiId + ":" + compiName
 
+        this.teach.getQuestions()
     }
 }
