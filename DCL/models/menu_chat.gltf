@@ -16,21 +16,16 @@
     "nodes" : [
         {
             "mesh" : 0,
-            "name" : "Cube.004",
-            "scale" : [
-                1.4204190969467163,
-                1.4204190969467163,
-                1.4204190969467163
-            ],
+            "name" : "Cube.006",
             "translation" : [
-                0.829514741897583,
-                1.1187934875488281,
-                -0.002839484717696905
+                -0.8381161689758301,
+                1.570200800895691,
+                0
             ]
         },
         {
             "mesh" : 1,
-            "name" : "Text.001",
+            "name" : "Text.003",
             "rotation" : [
                 0.7071068286895752,
                 0,
@@ -38,14 +33,14 @@
                 0.7071068286895752
             ],
             "scale" : [
-                0.08616070449352264,
-                0.08616070449352264,
-                0.08616070449352264
+                0.09428800642490387,
+                0.09428800642490387,
+                0.09428800642490387
             ],
             "translation" : [
-                0.7090187668800354,
-                1.1369707584381104,
-                0.016347087919712067
+                -0.963668942451477,
+                1.5350991487503052,
+                0.01093628816306591
             ]
         }
     ],
@@ -66,7 +61,7 @@
     ],
     "meshes" : [
         {
-            "name" : "Cube.004",
+            "name" : "Cube.006",
             "primitives" : [
                 {
                     "attributes" : {
@@ -79,7 +74,7 @@
             ]
         },
         {
-            "name" : "Text.001",
+            "name" : "Text.003",
             "primitives" : [
                 {
                     "attributes" : {
@@ -131,14 +126,14 @@
         {
             "bufferView" : 4,
             "componentType" : 5126,
-            "count" : 244,
+            "count" : 161,
             "max" : [
-                2.700000047683716,
+                2.690999984741211,
                 0,
-                1
+                0.009000000543892384
             ],
             "min" : [
-                0.04000000283122063,
+                0.04800000041723251,
                 0,
                 -0.6910000443458557
             ],
@@ -147,19 +142,19 @@
         {
             "bufferView" : 5,
             "componentType" : 5126,
-            "count" : 244,
+            "count" : 161,
             "type" : "VEC3"
         },
         {
             "bufferView" : 6,
             "componentType" : 5126,
-            "count" : 244,
+            "count" : 161,
             "type" : "VEC2"
         },
         {
             "bufferView" : 7,
             "componentType" : 5123,
-            "count" : 534,
+            "count" : 369,
             "type" : "SCALAR"
         }
     ],
@@ -186,29 +181,29 @@
         },
         {
             "buffer" : 0,
-            "byteLength" : 2928,
+            "byteLength" : 1932,
             "byteOffset" : 840
         },
         {
             "buffer" : 0,
-            "byteLength" : 2928,
-            "byteOffset" : 3768
+            "byteLength" : 1932,
+            "byteOffset" : 2772
         },
         {
             "buffer" : 0,
-            "byteLength" : 1952,
-            "byteOffset" : 6696
+            "byteLength" : 1288,
+            "byteOffset" : 4704
         },
         {
             "buffer" : 0,
-            "byteLength" : 1068,
-            "byteOffset" : 8648
+            "byteLength" : 738,
+            "byteOffset" : 5992
         }
     ],
     "buffers" : [
         {
-            "byteLength" : 9716,
-            "uri" : "setName.bin"
+            "byteLength" : 6732,
+            "uri" : "menu_chat.bin"
         }
     ]
 }

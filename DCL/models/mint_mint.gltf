@@ -16,21 +16,21 @@
     "nodes" : [
         {
             "mesh" : 0,
-            "name" : "Cube.004",
+            "name" : "Cube.001",
             "scale" : [
-                1.4204190969467163,
-                1.4204190969467163,
-                1.4204190969467163
+                1.4973167181015015,
+                1.4973167181015015,
+                1.4973167181015015
             ],
             "translation" : [
-                0.829514741897583,
-                1.1187934875488281,
-                -0.002839484717696905
+                0.8403463959693909,
+                1.3934117555618286,
+                -0.0036374120973050594
             ]
         },
         {
             "mesh" : 1,
-            "name" : "Text.001",
+            "name" : "Text",
             "rotation" : [
                 0.7071068286895752,
                 0,
@@ -38,14 +38,14 @@
                 0.7071068286895752
             ],
             "scale" : [
-                0.08616070449352264,
-                0.08616070449352264,
-                0.08616070449352264
+                0.14958374202251434,
+                0.14958374202251434,
+                0.14958374202251434
             ],
             "translation" : [
-                0.7090187668800354,
-                1.1369707584381104,
-                0.016347087919712067
+                0.6665353178977966,
+                1.3439782857894897,
+                0.01826566271483898
             ]
         }
     ],
@@ -66,7 +66,7 @@
     ],
     "meshes" : [
         {
-            "name" : "Cube.004",
+            "name" : "Cube.001",
             "primitives" : [
                 {
                     "attributes" : {
@@ -79,7 +79,7 @@
             ]
         },
         {
-            "name" : "Text.001",
+            "name" : "Text",
             "primitives" : [
                 {
                     "attributes" : {
@@ -131,35 +131,35 @@
         {
             "bufferView" : 4,
             "componentType" : 5126,
-            "count" : 244,
+            "count" : 43,
             "max" : [
-                2.700000047683716,
+                2.3990001678466797,
                 0,
-                1
+                0
             ],
             "min" : [
-                0.04000000283122063,
+                0.07300000637769699,
                 0,
-                -0.6910000443458557
+                -0.6820000410079956
             ],
             "type" : "VEC3"
         },
         {
             "bufferView" : 5,
             "componentType" : 5126,
-            "count" : 244,
+            "count" : 43,
             "type" : "VEC3"
         },
         {
             "bufferView" : 6,
             "componentType" : 5126,
-            "count" : 244,
+            "count" : 43,
             "type" : "VEC2"
         },
         {
             "bufferView" : 7,
             "componentType" : 5123,
-            "count" : 534,
+            "count" : 87,
             "type" : "SCALAR"
         }
     ],
@@ -186,29 +186,29 @@
         },
         {
             "buffer" : 0,
-            "byteLength" : 2928,
+            "byteLength" : 516,
             "byteOffset" : 840
         },
         {
             "buffer" : 0,
-            "byteLength" : 2928,
-            "byteOffset" : 3768
+            "byteLength" : 516,
+            "byteOffset" : 1356
         },
         {
             "buffer" : 0,
-            "byteLength" : 1952,
-            "byteOffset" : 6696
+            "byteLength" : 344,
+            "byteOffset" : 1872
         },
         {
             "buffer" : 0,
-            "byteLength" : 1068,
-            "byteOffset" : 8648
+            "byteLength" : 174,
+            "byteOffset" : 2216
         }
     ],
     "buffers" : [
         {
-            "byteLength" : 9716,
-            "uri" : "setName.bin"
+            "byteLength" : 2392,
+            "uri" : "mint_mint.bin"
         }
     ]
 }

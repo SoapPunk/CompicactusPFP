@@ -42,7 +42,7 @@ export const contracts = {
         mumbai: {
             version: '1',
             abi: abiMinter,
-            address: '0x4820E6424989c22eF7f41B67e7439aB9969fe948',
+            address: '0x0d7c91B526bA1334be837a82e92d6ca47ac6bCD7',
             name: 'CompiMinter',
             chainId: 80001
         }
@@ -175,9 +175,9 @@ export class Blockchain {
         })
     }
 
-    async mintCompi() {
+    async mintCompi(maxPrice: string) {
         const functionMintCompi = new eth.SolidityFunction(this.getFunction("mintCompi", abiMinter));
-        const functionSignature = functionMintCompi.toPayload([]);
+        const functionSignature = functionMintCompi.toPayload([maxPrice]);
         log(functionSignature)
         return this.prepareMetaTransaction(functionSignature, this.minter_contract).then().catch()
     }
@@ -196,10 +196,10 @@ export class Blockchain {
         })
     }
 
-    async increaseAllowance(amount:String) {
+    async increaseAllowance(amount: string) {
         const functionApprove = new eth.SolidityFunction(this.getFunction("increaseAllowance", abiMANA));
-        const amountValue = eth.toWei(amount, 'ether')
-        const functionSignature = functionApprove.toPayload([this.minter_contract.address, String(amountValue)]);
+        //const amountValue = eth.toWei(amount, 'ether')
+        const functionSignature = functionApprove.toPayload([this.minter_contract.address, amount]);
         log(functionSignature)
         return this.prepareMetaTransaction(functionSignature, this.mana_contract).then().catch()
     }
