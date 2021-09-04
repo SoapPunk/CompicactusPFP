@@ -4,6 +4,9 @@
 *.blend4
 *.blend5
 
+variations.json
+variations.ts
+
 .ethkey
 .maticvigil
 .secret

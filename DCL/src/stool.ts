@@ -1,6 +1,7 @@
 import { Blockchain } from "./contracts"
 import { Mint } from "./mint"
 import { Teach } from "./teach"
+import { Compicactus } from "./compicactus"
 import * as eth from "eth-connect"
 
 //Menu Shapes
@@ -11,7 +12,7 @@ const menu_photo_shape = new GLTFShape("models/menu_photo.gltf")
 const menu_sell_shape = new GLTFShape("models/menu_sell.gltf")
 
 const stool_shape = new GLTFShape("models/stool.gltf")
-const compicactus_shape = new GLTFShape("models/Compicactus.glb")
+//const compicactus_shape = new GLTFShape("models/Compicactus.glb")
 
 const sell_cargo_shape = new GLTFShape("models/sell_cargo.gltf")
 const sell_opensea_shape = new GLTFShape("models/sell_opensea.gltf")
@@ -48,7 +49,7 @@ export class Stool extends Entity {
     mint: Mint
     teach: Teach
 
-    compi_actions: Array<string>
+    //compi_actions: Array<string>
 
     constructor() {
         super()
@@ -88,33 +89,12 @@ export class Stool extends Entity {
             })
         )
 
-        this.compi_entity.addComponent(compicactus_shape)
+        this.compi_entity = new Compicactus()
         this.compi_entity.addComponent(new Transform({
             position: new Vector3(0, 1.05, -0.1),
-            scale: new Vector3(0.3, 0.3, 0.3)
+            scale: new Vector3(0.4, 0.4, 0.4)
         }))
         this.compi_entity.setParent(this)
-
-        let animator = new Animator()
-        this.compi_entity.addComponent(animator)
-        this.compi_actions = [
-            "Action-01-Look R-L",
-            "Action-02-Look R",
-            "Action-03-Look L",
-            "Action-04-Look-Up",
-            "Action-05-Sleep",
-            "Action-06-Dancing",
-            "Action-07-Swinging",
-            "Action-08-LOL",
-            "Action-09-Pissed Off",
-            "Action-10-Yawn",
-            "Action-11-Alert",
-            "Action-02 Sigh",
-        ]
-        this.compi_actions.forEach(element => {
-            animator.addClip(new AnimationState(element))
-        })
-        engine.addEntity(this.compi_entity)
 
         compidata_shape.fontSize = 1
         compidata_shape.value = "-"
