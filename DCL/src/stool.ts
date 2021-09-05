@@ -32,7 +32,7 @@ export class Stool extends Entity {
     menu_teach_entity: Entity = new Entity
     menu_photo_entity: Entity = new Entity
     menu_sell_entity: Entity = new Entity
-    compi_entity: Entity = new Entity
+    compi_entity: Compicactus
 
     sell_cargo_entity: Entity = new Entity
     sell_opensea_entity: Entity = new Entity
@@ -322,5 +322,7 @@ export class Stool extends Entity {
         compidata_shape.value = compiId + ":" + compiName
 
         this.teach.getQuestions()
+
+        this.compi_entity.set_body(this.current_compi)
     }
 }

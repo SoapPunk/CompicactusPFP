@@ -1,3 +1,5 @@
+import { fetchRetry } from './common'
+
 const elements = [
     "cigar",
     "eye",
@@ -17,10 +19,10 @@ const compi_actions = [
     "Action-06-Dancing",
     "Action-07-Swinging",
     "Action-08-LOL",
-    "Action-09-Pissed Off",
+    "Action-09-Pised Off",
     "Action-10-Yawn",
     "Action-11-Alert",
-    "Action-02 Sigh",
+    "Action-12 Sigh",
 ]
 
 const variations: any = {
@@ -114,6 +116,16 @@ const variations: any = {
     ]
 }
 
+type Variation = {
+    "body": string,
+    "cigar": string,
+    "eyes": string,
+    "glasses": string,
+    "hat": string,
+    "mustache": string,
+    "nose": string,
+    "pot": string
+}
 
 export class Compicactus extends Entity {
 
@@ -124,63 +136,81 @@ export class Compicactus extends Entity {
     nose_entity: Entity
     pot_entity: Entity*/
 
-    element_entities: any = {}
+    element_entities: Array<Entity> = []
+
+    variation: Variation
 
     constructor(){
         super()
 
-        // this.addComponent(new Transform())
-        //this.setParent(parent)
-
-        for (let n=0; n<elements.length; n++) {
-            this.element_entities[elements[n]] = new Entity()
-            this.element_entities[elements[n]].setParent(this)
-            const shape = variations[elements[n]][Math.floor(Math.random()*variations[elements[n]].length)]
-            //const shape = variations[elements[n]][0]
-            log("shape", shape)
-            this.element_entities[elements[n]].addComponent(new GLTFShape("compi_models/"+shape+".glb"))
-            let animator = new Animator()
-            this.element_entities[elements[n]].addComponent(animator)
+        this.variation = {
+            "body": "",
+            "cigar": "",
+            "eyes": "",
+            "glasses": "",
+            "hat": "",
+            "mustache": "",
+            "nose": "",
+            "pot": ""
         }
-
-        /*
-        this.compi_entity.addComponent(compicactus_shape)
-        this.compi_entity.addComponent(new Transform({
-            position: new Vector3(0, 1.05, -0.1),
-            scale: new Vector3(0.3, 0.3, 0.3)
-        }))
-        this.compi_entity.setParent(this)
-
-        let animator = new Animator()
-        this.compi_entity.addComponent(animator)
-        this.compi_actions = [
-            "Action-01-Look R-L",
-            "Action-02-Look R",
-            "Action-03-Look L",
-            "Action-04-Look-Up",
-            "Action-05-Sleep",
-            "Action-06-Dancing",
-            "Action-07-Swinging",
-            "Action-08-LOL",
-            "Action-09-Pissed Off",
-            "Action-10-Yawn",
-            "Action-11-Alert",
-            "Action-02 Sigh",
-        ]
-        this.compi_actions.forEach(element => {
-            animator.addClip(new AnimationState(element))
-        })
-        engine.addEntity(this.compi_entity)
-        */
+        this.set_body(0)
     }
 
     play_random() {
-        const clip_name = compi_actions[Math.round(Math.random()*compi_actions.length)]
-
-        for (let n=0; n<elements.length; n++) {
-            const clip = this.element_entities[elements[n]].getComponent(Animator).getClip(clip_name)
+        const clip_name = compi_actions[Math.floor(Math.random()*compi_actions.length)]
+        log("clip_name", clip_name)
+        for (let n=0; n<this.element_entities.length; n++) {
+            const clip = this.element_entities[n].getComponent(Animator).getClip(clip_name)
             clip.play()
             clip.looping = false
         }
+    }
+
+    remove_elements() {
+        for (let n=0; n<this.element_entities.length; n++) {
+            engine.removeEntity(this.element_entities[n])
+        }
+    }
+
+    async set_body(id: number) {
+        log("set body")
+        this.remove_elements()
+
+        const url = "https://ipfs.io/ipfs/QmVcN4A6EzBrrWcsovrKsRg5sTootZ9HmSuTadGQ2XrL9y"
+        const data = {
+            headers: {
+                'Accept': 'application/json'
+            },
+            method: "GET",
+        }
+        log("get variations")
+        const variations: Array<Variation> = await fetchRetry(url, data, 3).then(r => r.json()).catch(e => log("Error"))
+
+        log("variations", variations)
+
+        this.variation = variations[id]
+
+        this.add_element("body")
+        this.add_element("cigar")
+        this.add_element("eyes")
+        this.add_element("glasses")
+        this.add_element("hat")
+        this.add_element("mustache")
+        this.add_element("nose")
+        this.add_element("pot")
+    }
+
+    add_element(name: string) {
+        if (this.variation[name]=="") return
+        this.element_entities.push(new Entity)
+        this.get_last_element().addComponent(new GLTFShape("compi_models/"+this.variation[name]+".glb"))
+        this.get_last_element().addComponent(new Animator())
+        engine.addEntity(this.get_last_element())
+        this.get_last_element().setParent(this)
+        //return entity
+    }
+
+    get_last_element() {
+        return this.element_entities[this.element_entities.length-1]
     }
 }
