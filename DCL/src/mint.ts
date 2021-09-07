@@ -119,7 +119,7 @@ export class Mint {
             log("Enough balance")
         }
 
-        this.price_entity.getComponent(TextShape).value = price_human
+        this.price_entity.getComponent(TextShape).value = price_human.toString()
     }
 
     deactivate() {

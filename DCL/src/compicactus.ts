@@ -15,17 +15,21 @@ const compi_actions = [
     "Action-02-Look R",
     "Action-03-Look L",
     "Action-04-Look-Up",
-    "Action-05-Sleep",
+    /*"Action-05-Sleep",
     "Action-06-Dancing",
     "Action-07-Swinging",
     "Action-08-LOL",
     "Action-09-Pised Off",
     "Action-10-Yawn",
     "Action-11-Alert",
-    "Action-12 Sigh",
+    "Action-12 Sigh",*/
 ]
+/*
+type Variations = {
+    [id: string]: Array<string>
+}
 
-const variations: any = {
+const variations: Variations = {
     "cigar": [
         "Cigar-Brush",
         "Cigar-Faso",
@@ -115,6 +119,7 @@ const variations: any = {
         "Eyes-Yellow-None",
     ]
 }
+*/
 
 type Variation = {
     "body": string,
@@ -177,6 +182,7 @@ export class Compicactus extends Entity {
         this.remove_elements()
 
         const url = "https://ipfs.io/ipfs/QmVcN4A6EzBrrWcsovrKsRg5sTootZ9HmSuTadGQ2XrL9y"
+        //const url = "https://gateway.pinata.cloud/ipfs/QmVcN4A6EzBrrWcsovrKsRg5sTootZ9HmSuTadGQ2XrL9y"
         const data = {
             headers: {
                 'Accept': 'application/json'
@@ -184,7 +190,10 @@ export class Compicactus extends Entity {
             method: "GET",
         }
         log("get variations")
-        const variations: Array<Variation> = await fetchRetry(url, data, 3).then(r => r.json()).catch(e => log("Error"))
+        const variations: Array<Variation> = await fetchRetry(url, data, 3).then(r => {
+            if (r==undefined) return []
+            return r.json()
+        }).catch(e => log("Error"))
 
         log("variations", variations)
 
@@ -201,9 +210,9 @@ export class Compicactus extends Entity {
     }
 
     add_element(name: string) {
-        if (this.variation[name]=="") return
+        if (this.variation[name as keyof Variation]=="") return
         this.element_entities.push(new Entity)
-        this.get_last_element().addComponent(new GLTFShape("compi_models/"+this.variation[name]+".glb"))
+        this.get_last_element().addComponent(new GLTFShape("compi_models/"+this.variation[name as keyof Variation]+".glb"))
         this.get_last_element().addComponent(new Animator())
         engine.addEntity(this.get_last_element())
         this.get_last_element().setParent(this)

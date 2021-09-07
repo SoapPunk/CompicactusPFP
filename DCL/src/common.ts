@@ -38,7 +38,7 @@ export function interpolateValue(initialTime: number, finalTime: number, initial
 
 
 //
-export function interpolateAnimation(keyframes, currentTime) {
+export function interpolateAnimation(keyframes: Array<any>, currentTime: number) {
     let initialKeyframe = 0
     let finalKeyframe = 0
     for (let k=0; k<keyframes.length; k++) {
@@ -63,7 +63,7 @@ export function interpolateAnimation(keyframes, currentTime) {
 }
 
 
-export const fetchRetry = async (url: string, options, n: number) => {
+export const fetchRetry = async (url: string, options: any, n: number) => {
     for (let i = 0; i < n; i++) {
         try {
             return await fetch(url, options)
@@ -75,7 +75,7 @@ export const fetchRetry = async (url: string, options, n: number) => {
 }
 
 
-export function isInsideSquare(x, y, low_x, high_x, low_y, high_y) {
+export function isInsideSquare(x: number, y: number, low_x: number, high_x: number, low_y: number, high_y: number) {
     if (x < low_x || x > high_x || y < low_y || y > high_y) {
         return false
     }
@@ -83,12 +83,12 @@ export function isInsideSquare(x, y, low_x, high_x, low_y, high_y) {
 }
 
 
-export function dot(v1, v2) {
+export function dot(v1: Vector3, v2: Vector3) {
     return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
 }
 
 
-export function getGlobalPosition(entity: IEntity) {
+export function getGlobalPosition(entity: IEntity) :Vector3 {
     let entityPosition = entity.hasComponent(Transform) ? entity.getComponent(Transform).position.clone() : Vector3.Zero()
     let parentEntity = entity.getParent()
 
@@ -101,7 +101,7 @@ export function getGlobalPosition(entity: IEntity) {
 }
 
 
-export function planeRayIntersection(rayVector, rayPoint, planePoint, planeNormal) {
+export function planeRayIntersection(rayVector:Vector3, rayPoint:Vector3, planePoint:Vector3, planeNormal:Vector3) {
     const diff = rayPoint.subtract(planePoint)
     const prod1 = dot(diff, planeNormal)
     const prod2 = dot(rayVector, planeNormal)
@@ -110,7 +110,7 @@ export function planeRayIntersection(rayVector, rayPoint, planePoint, planeNorma
     return intersection
 }
 
-export function getUniqueEntityByComponent(component) {
+export function getUniqueEntityByComponent(component: any) {
     let inputs = engine.getEntitiesWithComponent(component)
     for (const key in inputs) {
         if (inputs.hasOwnProperty(key)) {

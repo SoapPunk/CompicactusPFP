@@ -153,16 +153,13 @@ export class Blockchain {
 
     // Minter
     async getPrice() {
-        const publicKeyRequest = await executeTask(async () => {
-          const publicKey = await getUserPublicKey()
-          return publicKey
-        })
+        const publicKeyRequest = await getUserPublicKey()
 
         log("publicKeyRequest", publicKeyRequest)
 
         return this.getFactory(
             this.minter_contract
-        ).then(async ( contract ) => {
+        ).then(async ( contract: any ) => {
             return await contract.getPrice(publicKeyRequest)
         })
     }
@@ -170,7 +167,7 @@ export class Blockchain {
     async isWindowOpen() {
         return this.getFactory(
             this.minter_contract
-        ).then(async ( contract ) => {
+        ).then(async ( contract: any ) => {
             return await contract.isWindowOpen()
         })
     }
@@ -184,14 +181,11 @@ export class Blockchain {
 
     // Mana
     async balance() {
-        const publicKeyRequest = await executeTask(async () => {
-          const publicKey = await getUserPublicKey()
-          return publicKey
-        })
+        const publicKeyRequest = await getUserPublicKey()
 
         return this.getFactory(
             this.mana_contract
-        ).then(async ( contract ) => {
+        ).then(async ( contract: any ) => {
             return await contract.balanceOf(publicKeyRequest)
         })
     }
@@ -206,31 +200,25 @@ export class Blockchain {
 
     // PFP
     async balanceOf() {
-        const publicKeyRequest = await executeTask(async () => {
-          const publicKey = await getUserPublicKey()
-          return publicKey
-        })
+        const publicKeyRequest = await getUserPublicKey()
 
         log("publicKeyRequest", publicKeyRequest)
 
         return this.getFactory(
             this.pfp_contract
-        ).then(async ( contract ) => {
+        ).then(async ( contract: any ) => {
             return await contract.balanceOf(publicKeyRequest)
         })
     }
 
     async tokenOfOwnerByIndex(tokenId: number) {
-        const publicKeyRequest = await executeTask(async () => {
-          const publicKey = await getUserPublicKey()
-          return publicKey
-        })
+        const publicKeyRequest = await getUserPublicKey()
 
         log("publicKeyRequest", publicKeyRequest)
 
         return this.getFactory(
             this.pfp_contract
-        ).then(async ( contract ) => {
+        ).then(async ( contract: any ) => {
             return await contract.tokenOfOwnerByIndex(publicKeyRequest, tokenId)
         })
     }
@@ -239,7 +227,7 @@ export class Blockchain {
     async getName(tokenId: number) {
         return this.getFactory(
             this.brain_contract
-        ).then(async ( contract ) => {
+        ).then(async ( contract: any ) => {
             return await contract.getName(this.pfp_contract.address, tokenId)
         })
     }
@@ -248,7 +236,7 @@ export class Blockchain {
 
         return this.getFactory(
             this.brain_contract
-        ).then(async ( contract ) => {
+        ).then(async ( contract: any ) => {
             return await contract.getQuestionsCount()
         })
     }
@@ -272,7 +260,7 @@ export class Blockchain {
         const scene = "default"
         return this.getFactory(
             this.brain_contract
-        ).then(async ( contract ) => {
+        ).then(async ( contract: any ) => {
             return await contract.getAnswer(this.pfp_contract.address, id, scene, question)
         })
     }
@@ -281,7 +269,7 @@ export class Blockchain {
         const scene = "default"
         return this.getFactory(
             this.brain_contract
-        ).then(async ( contract ) => {
+        ).then(async ( contract: any ) => {
             return await contract.getQuestions(this.pfp_contract.address, id, scene, offset)
         })
     }

@@ -12,7 +12,6 @@ const menu_photo_shape = new GLTFShape("models/menu_photo.gltf")
 const menu_sell_shape = new GLTFShape("models/menu_sell.gltf")
 
 const stool_shape = new GLTFShape("models/stool.gltf")
-//const compicactus_shape = new GLTFShape("models/Compicactus.glb")
 
 const sell_cargo_shape = new GLTFShape("models/sell_cargo.gltf")
 const sell_opensea_shape = new GLTFShape("models/sell_opensea.gltf")

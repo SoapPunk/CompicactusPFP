@@ -217,6 +217,8 @@ export class Teach {
         clip.looping = false*/
     }
 
+    async removeQuestion(self: Teach, n: number) {}
+
     async getQuestions() {
         if (!this.activated) return
 
