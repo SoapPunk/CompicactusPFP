@@ -15,14 +15,14 @@ const compi_actions = [
     "Action-02-Look R",
     "Action-03-Look L",
     "Action-04-Look-Up",
-    /*"Action-05-Sleep",
+    "Action-05-Sleep",
     "Action-06-Dancing",
     "Action-07-Swinging",
     "Action-08-LOL",
     "Action-09-Pised Off",
     "Action-10-Yawn",
     "Action-11-Alert",
-    "Action-12 Sigh",*/
+    "Action-12 Sigh",
 ]
 /*
 type Variations = {
@@ -145,6 +145,10 @@ export class Compicactus extends Entity {
 
     variation: Variation
 
+    // plane_entity: Entity
+
+    current_compi: number = 0
+
     constructor(){
         super()
 
@@ -158,17 +162,28 @@ export class Compicactus extends Entity {
             "nose": "",
             "pot": ""
         }
-        this.set_body(0)
+
+        // this.plane_entity = new Entity()
+        this.addComponent(new PlaneShape())
+        //this.addComponent(new Transform({
+        //    position: new Vector3(0, 0.5, 0),
+        //    scale: new Vector3(1, 1, 1)
+        //}))
+        // this.setParent(this)
+
+        this.set_mp4_body(this.current_compi)
     }
 
     play_random() {
-        const clip_name = compi_actions[Math.floor(Math.random()*compi_actions.length)]
+        /*const clip_name = compi_actions[Math.floor(Math.random()*compi_actions.length)]
         log("clip_name", clip_name)
         for (let n=0; n<this.element_entities.length; n++) {
             const clip = this.element_entities[n].getComponent(Animator).getClip(clip_name)
             clip.play()
             clip.looping = false
-        }
+        }*/
+        const clip_id = Math.floor(Math.random()*compi_actions.length)
+        this.set_mp4_body(this.current_compi, clip_id)
     }
 
     remove_elements() {
@@ -177,12 +192,26 @@ export class Compicactus extends Entity {
         }
     }
 
+    async set_mp4_body(id: number, animation: number = 0) {
+        log("set mp4 body")
+
+        const action = compi_actions[animation]
+        const myVideoClip = new VideoClip(
+          `mp4/${id}/${id}_${action}.mp4`
+        )
+        const myVideoTexture = new VideoTexture(myVideoClip)
+
+        const myMaterial = new BasicMaterial()
+        myMaterial.texture = myVideoTexture
+        this.addComponentOrReplace(myMaterial)
+        myVideoTexture.playing = true
+    }
+
     async set_body(id: number) {
         log("set body")
         this.remove_elements()
 
         const url = "https://ipfs.io/ipfs/QmVcN4A6EzBrrWcsovrKsRg5sTootZ9HmSuTadGQ2XrL9y"
-        //const url = "https://gateway.pinata.cloud/ipfs/QmVcN4A6EzBrrWcsovrKsRg5sTootZ9HmSuTadGQ2XrL9y"
         const data = {
             headers: {
                 'Accept': 'application/json'

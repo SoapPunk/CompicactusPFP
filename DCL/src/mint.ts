@@ -23,7 +23,9 @@ export class Mint {
     constructor(parent: Entity) {
         mint_mint_shape.visible = false
         this.mint_mint_entity.addComponent(mint_mint_shape)
-        this.mint_mint_entity.addComponent(new Transform())
+        this.mint_mint_entity.addComponent(new Transform({
+            position: new Vector3(0, 0.5, 0)
+        }))
         this.mint_mint_entity.setParent(parent)
         engine.addEntity(this.mint_mint_entity)
         this.mint_mint_entity.addComponent(
@@ -35,19 +37,25 @@ export class Mint {
 
         mint_50off_shape.visible = false
         this.mint_50off_entity.addComponent(mint_50off_shape)
-        this.mint_50off_entity.addComponent(new Transform())
+        this.mint_50off_entity.addComponent(new Transform({
+            position: new Vector3(0, 0.5, 0)
+        }))
         this.mint_50off_entity.setParent(parent)
         engine.addEntity(this.mint_50off_entity)
 
         mint_price_shape.visible = false
         this.mint_price_entity.addComponent(mint_price_shape)
-        this.mint_price_entity.addComponent(new Transform())
+        this.mint_price_entity.addComponent(new Transform({
+            position: new Vector3(0, 0.5, 0)
+        }))
         this.mint_price_entity.setParent(parent)
         engine.addEntity(this.mint_price_entity)
 
         mint_getpmana_shape.visible = false
         this.mint_getpmana_entity.addComponent(mint_getpmana_shape)
-        this.mint_getpmana_entity.addComponent(new Transform())
+        this.mint_getpmana_entity.addComponent(new Transform({
+            position: new Vector3(0, 0.5, 0)
+        }))
         this.mint_getpmana_entity.setParent(parent)
         engine.addEntity(this.mint_getpmana_entity)
         this.mint_getpmana_entity.addComponent(
@@ -63,7 +71,7 @@ export class Mint {
         price_shape.visible = false
         this.price_entity.addComponent(price_shape)
         this.price_entity.addComponent(new Transform({
-            position: new Vector3(-.82, 1.76, 0.01),
+            position: new Vector3(-.82, 1.76+0.5, 0.01),
             rotation: Quaternion.Euler(0, 180, 0)
         }))
         this.price_entity.setParent(parent)

@@ -1,6 +1,7 @@
 //import { getUserAccount } from '@decentraland/EthereumController'
 import { getUserPublicKey } from "@decentraland/Identity"
 import { getProvider } from "@decentraland/web3-provider";
+import { sleep } from "./common"
 import {
   //ContractName,
   //getContract,
@@ -92,7 +93,7 @@ export class Blockchain {
     // functionSetGreeting = new eth.SolidityFunction(this.getFunction("setGreeting", abiMinter));
 
     constructor(network="mumbai") {
-        if (network != "mumbai" && network != "matic") {
+        if (network != "mumbai" && network != "matic" && network != "mockup") {
             throw new Error("Network not found: " + network)
         }
         /*const publicKeyRequest = executeTask(async () => {
@@ -103,12 +104,13 @@ export class Blockchain {
         this.network = network
         if (network == "mumbai") {
             //this.provider = new eth.WebSocketProvider("wss://rpc-mainnet.maticvigil.com/ws/v1/")
-            this.provider = new eth.HTTPProvider("https://rpc-mumbai.maticvigil.com")
+            //this.provider = new eth.HTTPProvider("https://rpc-mumbai.maticvigil.com")
+            this.provider = new eth.HTTPProvider("https://matic-mumbai.chainstacklabs.com/")
             this.mana_contract = contracts.mana.mumbai
             this.minter_contract = contracts.minter.mumbai
             this.pfp_contract = contracts.pfp.mumbai
             this.brain_contract = contracts.brain.mumbai
-        } else {
+        } else if (network == "matic") {
             this.provider = new eth.HTTPProvider("https://rpc-mainnet.maticvigil.com")
             this.mana_contract = contracts.mana.matic
             this.minter_contract = contracts.minter.matic
@@ -153,6 +155,7 @@ export class Blockchain {
 
     // Minter
     async getPrice() {
+        if (this.network == "mockup") return await this.mockupAnswer([10000000000000000000, false])
         const publicKeyRequest = await getUserPublicKey()
 
         log("publicKeyRequest", publicKeyRequest)
@@ -200,6 +203,7 @@ export class Blockchain {
 
     // PFP
     async balanceOf() {
+        if (this.network == "mockup") return await this.mockupAnswer(4)
         const publicKeyRequest = await getUserPublicKey()
 
         log("publicKeyRequest", publicKeyRequest)
@@ -212,6 +216,7 @@ export class Blockchain {
     }
 
     async tokenOfOwnerByIndex(tokenId: number) {
+        if (this.network == "mockup") return await this.mockupAnswer(tokenId)
         const publicKeyRequest = await getUserPublicKey()
 
         log("publicKeyRequest", publicKeyRequest)
@@ -225,6 +230,7 @@ export class Blockchain {
 
     // Brain
     async getName(tokenId: number) {
+        if (this.network == "mockup") return await this.mockupAnswer("Mockup Name")
         return this.getFactory(
             this.brain_contract
         ).then(async ( contract: any ) => {
@@ -266,6 +272,20 @@ export class Blockchain {
     }
 
     async getQuestions(id:number, offset:number) {
+        if (this.network == "mockup") return await this.mockupAnswer(
+            [
+                "Hi!",
+                "Who are you?",
+                "What are you?",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                ""
+            ]
+        )
         const scene = "default"
         return this.getFactory(
             this.brain_contract
@@ -299,5 +319,9 @@ export class Blockchain {
         })
     }*/
 
+    async mockupAnswer(answer: any) {
+        sleep(500 + (500*Math.random()))
+        return answer
+    }
 
 }

@@ -1,9 +1,331 @@
 import { Blockchain } from "./contracts"
-import { Mint } from "./mint"
-import { Teach } from "./teach"
+// import { Mint } from "./mint"
+// import { Teach } from "./teach"
 import { Compicactus } from "./compicactus"
 import * as eth from "eth-connect"
 
+import planesMenu from "./planesMenu"
+
+
+const blockchain = new Blockchain("mockup")
+
+@Component("stool")
+export class StoolComponent {
+    current_compi: number = -1
+    current_token: number = -1
+    current_menu: number = 0
+
+    goto_compi: number = -1
+    dirty: boolean = false
+
+    answer: string = ""
+    questions: string = ""
+
+    price: string = "-"
+    price_number: number = 0
+    price_discount: boolean = false
+}
+
+export class Stool extends Entity {
+    compi_entity: Compicactus
+
+    compidata_entity: Entity
+    compidata_shape: TextShape = new TextShape()
+
+    answer_entity: Entity
+    answer_shape: TextShape = new TextShape()
+
+    questions_entity: Entity
+    questions_shape: TextShape = new TextShape()
+
+    price_entity: Entity
+    price_shape: TextShape = new TextShape()
+
+    stool_component: StoolComponent
+
+    constructor() {
+        super()
+
+        this.addComponent(new Transform({
+            position: new Vector3(8, 1.5, 8)
+        }))
+        this.stool_component = new StoolComponent()
+        this.addComponent(this.stool_component)
+        engine.addEntity(this)
+
+        const add_entity = this.createPlane(planesMenu.Add)
+        const arrowdown_entity = this.createPlane(planesMenu.ArrowDown)
+        const arrowup_entity = this.createPlane(planesMenu.ArrowUp)
+        const cargologo_entity = this.createPlane(planesMenu.CargoLogo)
+        const dialogbackground_entity = this.createPlane(planesMenu.DialogBackground)
+        const edit_entity = this.createPlane(planesMenu.Edit)
+        const help_entity = this.createPlane(planesMenu.Help)
+        const mainbackground_entity = this.createPlane(planesMenu.MainBackground)
+        const mint_entity = this.createPlane(planesMenu.Mint)
+        const opensealogo_entity = this.createPlane(planesMenu.OpenSeaLogo)
+        const polygonmana_entity = this.createPlane(planesMenu.PolygonMana)
+        const remove_entity = this.createPlane(planesMenu.Remove)
+        const setname_entity = this.createPlane(planesMenu.SetName)
+
+        cargologo_entity.addComponent(
+            new OnPointerDown(() => {
+                openExternalURL("https://app.cargo.build")
+            },
+            {
+                hoverText: "Go to Cargo",
+            })
+        )
+
+        opensealogo_entity.addComponent(
+            new OnPointerDown(() => {
+                openExternalURL("https://opensea.io/")
+            },
+            {
+                hoverText: "Go to OpenSea",
+            })
+        )
+
+        help_entity.addComponent(
+            new OnPointerDown(() => {
+                openExternalURL("https://compicactus.com")
+            },
+            {
+                hoverText: "Go to Compicactus.com",
+            })
+        )
+
+        polygonmana_entity.addComponent(
+            new OnPointerDown(() => {
+                openExternalURL("https://account.decentraland.org/")
+            },
+            {
+                hoverText: "Get Polygon Mana",
+            })
+        )
+
+        // Compicactus
+        this.compi_entity = new Compicactus()
+        this.compi_entity.addComponent(new Transform({
+            position: new Vector3(0.05, 0.4, 0.02),
+            scale: new Vector3(0.8, 0.8, 0.8)
+        }))
+        this.compi_entity.setParent(this)
+        this.compi_entity.addComponent(
+            new OnPointerDown(()=>{
+                // this.next(this)
+                this.stool_component.goto_compi += 1
+            },
+            {
+                hoverText: "Next Compi",
+                showFeedback: false
+            })
+        )
+
+        // Compi Data (id: name)
+        this.compidata_shape.fontSize = 1
+        this.compidata_shape.value = "-"
+        this.compidata_shape.hTextAlign = "left"
+        this.compidata_shape.vTextAlign = "center"
+        this.compidata_shape.font = new Font(Fonts.SanFrancisco_Heavy)
+        this.compidata_shape.color = Color3.Black()
+        this.compidata_entity = new Entity()
+        this.compidata_entity.addComponent(this.compidata_shape)
+        this.compidata_entity.addComponent(new Transform({
+            position: new Vector3(0.53, -0.18, 0.02),
+            rotation: Quaternion.Euler(0, 180, 11.5),
+            scale: new Vector3(0.4, 0.4, 0.4)
+        }))
+        this.compidata_entity.setParent(this)
+
+        // Questions list
+        this.questions_shape.textWrapping = true
+        this.questions_shape.font = new Font(Fonts.SanFrancisco_Heavy)
+        this.questions_shape.hTextAlign = "left"
+        this.questions_shape.vTextAlign = "top"
+        this.questions_shape.fontSize = 1
+        this.questions_shape.fontWeight = 'normal'
+        this.questions_shape.value = "Question 1"
+        this.questions_shape.width = 1.5
+        this.questions_shape.color = Color3.Black()
+        this.questions_entity = new Entity()
+        this.questions_entity.addComponent(this.questions_shape)
+        this.questions_entity.addComponent(new Transform({
+            position: new Vector3(-0.82, 0.27, 0.05),
+            rotation: Quaternion.Euler(0, 180, 0),
+            scale: new Vector3(0.5, 0.5, 1)
+        }))
+        this.questions_entity.setParent(this)
+
+
+        // Answer Text
+        this.answer_shape.textWrapping = true
+        this.answer_shape.font = new Font(Fonts.SanFrancisco_Heavy)
+        this.answer_shape.hTextAlign = "center"
+        this.answer_shape.vTextAlign = "top"
+        this.answer_shape.fontSize = 1
+        this.answer_shape.fontWeight = 'normal'
+        this.answer_shape.value = ""
+        this.answer_shape.width = 1.5
+        this.answer_shape.color = Color3.Black()
+        this.answer_entity = new Entity()
+        this.answer_entity.addComponent(this.answer_shape)
+        this.answer_entity.addComponent(new Transform({
+            position: new Vector3(0, -0.5, 0.01),
+            rotation: Quaternion.Euler(0, 180, 0),
+            scale: new Vector3(0.5, 0.5, 1)
+        }))
+        this.answer_entity.setParent(this)
+
+
+        // Price Text
+        this.price_shape.textWrapping = true
+        this.price_shape.font = new Font(Fonts.SanFrancisco_Heavy)
+        this.price_shape.hTextAlign = "center"
+        this.price_shape.vTextAlign = "top"
+        this.price_shape.fontSize = 1
+        this.price_shape.fontWeight = 'normal'
+        this.price_shape.value = "-"
+        this.price_shape.width = 1.5
+        this.price_shape.color = Color3.Black()
+        this.price_entity = new Entity()
+        this.price_entity.addComponent(this.price_shape)
+        this.price_entity.addComponent(new Transform({
+            position: new Vector3(0.7, 0.07, 0.05),
+            rotation: Quaternion.Euler(0, 180, 0),
+            scale: new Vector3(1, 1, 1)
+        }))
+        this.price_entity.setParent(this)
+
+
+        this.stool_component.answer = "Testing!"
+    }
+
+    createPlane(data: any) {
+        const e = new Entity()
+        const plane = new PlaneShape()
+        plane.uvs = data.uv
+        e.addComponent(plane)
+        e.addComponent(new Transform({
+            position: new Vector3(...data.position),
+            rotation: new Quaternion(...data.rotation),
+            scale: new Vector3(...data.scale)
+        }))
+
+        const myTexture = new Texture("textures/CompiUI.png")
+        const myMaterial = new Material()
+        myMaterial.transparencyMode = 1
+        myMaterial.albedoTexture = myTexture
+        e.addComponent(myMaterial)
+        e.setParent(this)
+        return e
+    }
+}
+
+const stoolGroup = engine.getComponentGroup(StoolComponent)
+
+export class StoolSystem implements ISystem {
+    update(dt: number) {
+        for (let entity of stoolGroup.entities) {
+            let stool = entity as Stool
+            const stool_component = entity.getComponent(StoolComponent)
+            if (stool_component.current_compi != stool_component.goto_compi) {
+                this.goto(stool_component)
+            }
+            if (stool_component.dirty) {
+                this.updateCompi(stool)
+            }
+            if (stool_component.answer != stool.answer_shape.value) {
+                stool.answer_shape.value = stool_component.answer
+                stool.answer_shape.width = 1.5
+            }
+            if (stool_component.questions != stool.questions_shape.value) {
+                stool.questions_shape.value = stool_component.questions
+                stool.questions_shape.width = 1.5
+            }
+            if (stool_component.price == "-") {
+                this.updatePrice(stool_component)
+            }
+            if (stool_component.price != stool.price_shape.value) {
+                stool.price_shape.value = stool_component.price
+            }
+        }
+    }
+
+    async updatePrice(stool_component: StoolComponent) {
+        log("Getting price")
+        const price = await blockchain.getPrice()
+        log("this.current_price", price)
+        const price_human = eth.fromWei(price[0].toString(), 'ether')
+        log("price_human", price_human)
+        stool_component.price = price_human
+        stool_component.price_number = price[0]
+        stool_component.price_discount = price[1]
+    }
+
+    async goto(stool_component: StoolComponent) {
+        log("Getting compis")
+
+        const compisCount = await blockchain.balanceOf()
+
+        if (compisCount>0) {
+            if (stool_component.goto_compi<0) {
+                stool_component.current_compi = compisCount
+                stool_component.goto_compi = compisCount
+
+                stool_component.dirty = true
+            } else if (stool_component.goto_compi>=compisCount) {
+                stool_component.current_compi = 0
+                stool_component.goto_compi = 0
+
+                stool_component.dirty = true
+            }
+            stool_component.current_compi = stool_component.goto_compi
+            stool_component.dirty = true
+        } else {
+            stool_component.goto_compi = -1
+            stool_component.current_compi = -1
+
+            stool_component.dirty = true
+        }
+
+        log(stool_component.goto_compi, stool_component.current_compi)
+    }
+
+    async updateCompi(entity: Stool) {
+        const stool_component = entity.getComponent(StoolComponent)
+        stool_component.dirty = false
+        if (stool_component.current_compi < 0) return
+
+        entity.compidata_shape.value = "-"
+
+        const compiId = await blockchain.tokenOfOwnerByIndex(stool_component.current_compi)
+
+        stool_component.current_token = compiId
+
+        const compiName = await blockchain.getName(compiId)
+
+        entity.compidata_shape.value = compiId + ":" + compiName
+
+        //this.teach.getQuestions()
+
+        entity.compi_entity.set_mp4_body(stool_component.current_compi)
+
+        // Get questions
+
+        const offset = 0
+        const questions = await blockchain.getQuestions(stool_component.current_token, offset)
+        log(questions)
+
+        let questions_text = ""
+        for (let n=0; n < questions.length; n++) {
+            questions_text += `${questions[n]}\n`
+        }
+
+        stool_component.questions = questions_text
+    }
+}
+
+/*
 //Menu Shapes
 const menu_mint_shape = new GLTFShape("models/menu_mint.gltf")
 const menu_chat_shape = new GLTFShape("models/menu_chat.gltf")
@@ -11,18 +333,23 @@ const menu_teach_shape = new GLTFShape("models/menu_teach.gltf")
 const menu_photo_shape = new GLTFShape("models/menu_photo.gltf")
 const menu_sell_shape = new GLTFShape("models/menu_sell.gltf")
 
-const stool_shape = new GLTFShape("models/stool.gltf")
+// const stool_shape = new GLTFShape("models/stool.gltf")
 
 const sell_cargo_shape = new GLTFShape("models/sell_cargo.gltf")
 const sell_opensea_shape = new GLTFShape("models/sell_opensea.gltf")
 
-const left_shape = new GLTFShape("models/left.gltf")
-const right_shape = new GLTFShape("models/right.gltf")
+// const left_shape = new GLTFShape("models/left.gltf")
+// const right_shape = new GLTFShape("models/right.gltf")
 const compidata_shape = new TextShape()
 const answer_shape = new TextShape()
 
 const blockchain = new Blockchain("mumbai")
 
+@Component("stool")
+export class StoolComponent {
+    //spinning: boolean
+    //speed: number
+}
 
 export class Stool extends Entity {
     // Menu entities
@@ -32,12 +359,16 @@ export class Stool extends Entity {
     menu_photo_entity: Entity = new Entity
     menu_sell_entity: Entity = new Entity
     compi_entity: Compicactus
+    menu_background_entity: Entity = new Entity
 
     sell_cargo_entity: Entity = new Entity
     sell_opensea_entity: Entity = new Entity
 
     left_entity: Entity = new Entity
     right_entity: Entity = new Entity
+    up_entity: Entity = new Entity
+    down_entity: Entity = new Entity
+
     compidata_entity: Entity = new Entity
     answer_entity: Entity = new Entity
 
@@ -53,11 +384,12 @@ export class Stool extends Entity {
     constructor() {
         super()
 
-        this.addComponent(stool_shape)
+        //this.addComponent(stool_shape)
         this.addComponent(new Transform({
             position: new Vector3(8, 0, 8)
         }))
         this.addComponent(new Billboard(false, true ,false))
+        this.addComponent(new StoolComponent())
         engine.addEntity(this)
 
         this.mint = new Mint(this)
@@ -66,8 +398,12 @@ export class Stool extends Entity {
 
         this.setupSell()
 
-        this.left_entity.addComponent(left_shape)
-        this.left_entity.addComponent(new Transform())
+        // Left
+        this.left_entity.addComponent(new GLTFShape("models/button_arrow.gltf"))
+        this.left_entity.addComponent(new Transform({
+            position: new Vector3(0.5, 1.5+0.2, 0),
+            rotation: Quaternion.Euler(0, 0, 180)
+        }))
         this.left_entity.setParent(this)
         engine.addEntity(this.left_entity)
         this.left_entity.addComponent(
@@ -77,8 +413,11 @@ export class Stool extends Entity {
             })
         )
 
-        this.right_entity.addComponent(right_shape)
-        this.right_entity.addComponent(new Transform())
+        // Right
+        this.right_entity.addComponent(new GLTFShape("models/button_arrow.gltf"))
+        this.right_entity.addComponent(new Transform({
+            position: new Vector3(-0.5, 1.5+0.2, 0)
+        }))
         this.right_entity.setParent(this)
         engine.addEntity(this.right_entity)
         this.right_entity.addComponent(
@@ -88,31 +427,82 @@ export class Stool extends Entity {
             })
         )
 
+        // Up
+        this.up_entity.addComponent(new GLTFShape("models/button_arrow.gltf"))
+        this.up_entity.addComponent(new Transform({
+            position: new Vector3(-0.15, 1.2+0.2, 0),
+            rotation: Quaternion.Euler(0, 0, -90)
+        }))
+        this.up_entity.setParent(this)
+        engine.addEntity(this.up_entity)
+        this.up_entity.addComponent(
+            new OnPointerDown(()=>{this.next(this)},
+            {
+                hoverText: "Up",
+            })
+        )
+
+        // Down
+        this.down_entity.addComponent(new GLTFShape("models/button_arrow.gltf"))
+        this.down_entity.addComponent(new Transform({
+            position: new Vector3(0.15, 1.2+0.2, 0),
+            rotation: Quaternion.Euler(0, 0, 90)
+        }))
+        this.down_entity.setParent(this)
+        engine.addEntity(this.down_entity)
+        this.down_entity.addComponent(
+            new OnPointerDown(()=>{this.next(this)},
+            {
+                hoverText: "Down",
+            })
+        )
+
+
+        this.menu_background_entity.addComponent(new PlaneShape())
+        this.menu_background_entity.addComponent(new Transform({
+            position: new Vector3(0, 1.2+0.1, -.2),
+            scale: new Vector3(2, 2.5, 1)
+        }))
+        const backgroundMaterial = new BasicMaterial()
+        backgroundMaterial.texture = new Texture("textures/background.jpg")
+        this.menu_background_entity.addComponent(backgroundMaterial)
+        this.menu_background_entity.setParent(this)
+
         this.compi_entity = new Compicactus()
         this.compi_entity.addComponent(new Transform({
-            position: new Vector3(0, 1.05, -0.1),
-            scale: new Vector3(0.4, 0.4, 0.4)
+            position: new Vector3(0, 1.3+0.2, -0.1),
+            scale: new Vector3(0.8, 0.8, 0.8)
         }))
         this.compi_entity.setParent(this)
 
         compidata_shape.fontSize = 1
         compidata_shape.value = "-"
+        compidata_shape.hTextAlign = "center"
+        compidata_shape.vTextAlign = "top"
+        compidata_shape.font = new Font(Fonts.SanFrancisco_Heavy)
+        compidata_shape.color = Color3.Black()
         this.compidata_entity.addComponent(compidata_shape)
         this.compidata_entity.addComponent(new Transform({
-            position: new Vector3(0, 1.1, 0),
+            position: new Vector3(0, 2.2+0.2, 0),
             rotation: Quaternion.Euler(0, 180, 0)
         }))
         this.compidata_entity.setParent(this)
         engine.addEntity(this.compidata_entity)
 
-        answer_shape.fontSize = 2
-        answer_shape.value = "-"
+        answer_shape.textWrapping = true
+        answer_shape.font = new Font(Fonts.SanFrancisco_Heavy)
+        answer_shape.hTextAlign = "center"
+        answer_shape.vTextAlign = "top"
+        answer_shape.fontSize = 1
+        answer_shape.fontWeight = 'normal'
+        // answer_shape.value = "-"
+
         answer_shape.color = Color3.Black()
-        answer_shape.outlineColor = Color3.White()
-        answer_shape.outlineWidth = .1
+        //answer_shape.outlineColor = Color3.White()
+        //answer_shape.outlineWidth = .1
         this.answer_entity.addComponent(answer_shape)
         this.answer_entity.addComponent(new Transform({
-            position: new Vector3(0, 1.9, 0),
+            position: new Vector3(0, 0.8, 0),
             rotation: Quaternion.Euler(0, 180, 0)
         }))
         this.answer_entity.setParent(this)
@@ -121,6 +511,13 @@ export class Stool extends Entity {
         this.setupMenu()
 
         this.ownsCompi()
+
+        this.setAnswer("This is a test fsdf sdfdf sdfsdf sdfsdf sdfsdf asadsd asdasd asdasd asdasdasd asdasdasd asdasdad asdasdasd asdasdsd asdasdasd")
+    }
+
+    setAnswer(text: string){
+        answer_shape.value = text
+        answer_shape.width = 1.5
     }
 
     setupSell() {
@@ -157,7 +554,9 @@ export class Stool extends Entity {
 
     setupMenu() {
         this.menu_mint_entity.addComponent(menu_mint_shape)
-        this.menu_mint_entity.addComponent(new Transform())
+        this.menu_mint_entity.addComponent(new Transform({
+            position: new Vector3(0, 0.5, 0)
+        }))
         this.menu_mint_entity.setParent(this)
         engine.addEntity(this.menu_mint_entity)
         this.menu_mint_entity.addComponent(
@@ -171,7 +570,9 @@ export class Stool extends Entity {
         )
 
         this.menu_chat_entity.addComponent(menu_chat_shape)
-        this.menu_chat_entity.addComponent(new Transform())
+        this.menu_chat_entity.addComponent(new Transform({
+            position: new Vector3(0, 0.5, 0)
+        }))
         this.menu_chat_entity.setParent(this)
         engine.addEntity(this.menu_chat_entity)
         this.menu_chat_entity.addComponent(
@@ -185,7 +586,9 @@ export class Stool extends Entity {
         )
 
         this.menu_teach_entity.addComponent(menu_teach_shape)
-        this.menu_teach_entity.addComponent(new Transform())
+        this.menu_teach_entity.addComponent(new Transform({
+            position: new Vector3(0, 0.5, 0)
+        }))
         this.menu_teach_entity.setParent(this)
         engine.addEntity(this.menu_teach_entity)
         this.menu_teach_entity.addComponent(
@@ -199,7 +602,9 @@ export class Stool extends Entity {
         )
 
         this.menu_photo_entity.addComponent(menu_photo_shape)
-        this.menu_photo_entity.addComponent(new Transform())
+        this.menu_photo_entity.addComponent(new Transform({
+            position: new Vector3(0, 0.5, 0)
+        }))
         this.menu_photo_entity.setParent(this)
         engine.addEntity(this.menu_photo_entity)
         this.menu_photo_entity.addComponent(
@@ -213,7 +618,9 @@ export class Stool extends Entity {
         )
 
         this.menu_sell_entity.addComponent(menu_sell_shape)
-        this.menu_sell_entity.addComponent(new Transform())
+        this.menu_sell_entity.addComponent(new Transform({
+            position: new Vector3(0, 0.5, 0)
+        }))
         this.menu_sell_entity.setParent(this)
         engine.addEntity(this.menu_sell_entity)
         this.menu_sell_entity.addComponent(
@@ -322,6 +729,17 @@ export class Stool extends Entity {
 
         this.teach.getQuestions()
 
-        this.compi_entity.set_body(this.current_compi)
+        this.compi_entity.set_mp4_body(this.current_compi)
     }
 }
+const stoolGroup = engine.getComponentGroup(StoolComponent)
+
+export class StoolSystem implements ISystem {
+    update(dt: number) {
+        for (let entity of stoolGroup.entities) {
+
+        }
+    }
+}
+
+*/

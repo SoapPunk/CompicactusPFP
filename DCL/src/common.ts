@@ -160,3 +160,13 @@ export function gravityToVelocity(force:number, inv_mass:number, gravity:number,
     // Symplectic Euler
     return force * inv_mass * dt
 }
+
+
+export function sleep(milliseconds:number) {
+    var start = new Date().getTime();
+    for (var i = 0; i < 1e7; i++) {
+        if ((new Date().getTime() - start) > milliseconds) {
+            break;
+        }
+    }
+}

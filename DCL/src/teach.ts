@@ -208,8 +208,10 @@ export class Teach {
     }
 
     async askQuestion(self: Teach, n: number) {
-        const answer = await blockchain.getAnswer(this.parent.current_token, this.question_list[n].value)
-        this.parent.answer_entity.getComponent(TextShape).value = answer
+        const question_text = this.question_list[n].value
+        const answer = await blockchain.getAnswer(this.parent.current_token, question_text)
+        const answer_text = `You: ${question_text}\n\nCompi: ${answer}`
+        this.parent.setAnswer(answer_text)
         this.parent.compi_entity.play_random()
         /*const clip_name = this.parent.compi_actions[Math.round(Math.random()*this.parent.compi_actions.length)]
         const clip = this.parent.compi_entity.getComponent(Animator).getClip(clip_name)
