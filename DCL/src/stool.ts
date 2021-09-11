@@ -4,10 +4,23 @@ import { Blockchain } from "./contracts"
 import { Compicactus } from "./compicactus"
 import * as eth from "eth-connect"
 
-import planesMenu from "./planesMenu"
+import planesMenu from "./planesMenuB"
+
+const current_chain = "mumbai"
+const blockchain = new Blockchain(current_chain)
 
 
-const blockchain = new Blockchain("mockup")
+const panelsAlbedoTexture = new Texture("textures/CompiUIB.png")
+//const panelsEmissiveTexture = new Texture("textures/CompiUIEmission.jpg")
+const myMaterial = new Material()
+myMaterial.transparencyMode = 1
+myMaterial.albedoTexture = panelsAlbedoTexture
+//myMaterial.emissiveTexture = panelsEmissiveTexture
+//myMaterial.emissiveIntensity = 1
+//myMaterial.emissiveColor = new Color3(0.5, 0.5, 0.5)
+
+const canvas = new UICanvas()
+
 
 @Component("stool")
 export class StoolComponent {
@@ -18,12 +31,21 @@ export class StoolComponent {
     goto_compi: number = -1
     dirty: boolean = false
 
-    answer: string = ""
+    answer: string = "Test answer!"
     questions: string = ""
+    name: string = ""
 
     price: string = "-"
     price_number: number = 0
     price_discount: boolean = false
+
+    question_list: Array<{id: number, value: string}> = []
+    selected_question: number = 0
+
+    name_to_set: string = ""
+    answer_to_set: string = ""
+    question_to_add: string = ""
+    asking_question: string = ""
 }
 
 export class Stool extends Entity {
@@ -38,13 +60,20 @@ export class Stool extends Entity {
     questions_entity: Entity
     questions_shape: TextShape = new TextShape()
 
-    price_entity: Entity
-    price_shape: TextShape = new TextShape()
+    //price_entity: Entity
+    //price_shape: TextShape = new TextShape()
 
     stool_component: StoolComponent
 
+    textInput:UIInputText
+    //teach: Teach
+
     constructor() {
         super()
+
+        //this.teach = new Teach(this, current_chain)
+
+        this.textInput = new UIInputText(canvas)
 
         this.addComponent(new Transform({
             position: new Vector3(8, 1.5, 8)
@@ -53,8 +82,22 @@ export class Stool extends Entity {
         this.addComponent(this.stool_component)
         engine.addEntity(this)
 
-        const add_entity = this.createPlane(planesMenu.Add)
-        const arrowdown_entity = this.createPlane(planesMenu.ArrowDown)
+        const addquestion_entity = this.createPlane(planesMenu.Add)
+        const arrowleftcompi_entity = this.createPlane(planesMenu.ArrowLeftCompi)
+        const arrowleftquestions_entity = this.createPlane(planesMenu.ArrowLeftQuestions)
+        const arrowrightcompi_entity = this.createPlane(planesMenu.ArrowRightCompi)
+        const arrowrightquestions_entity = this.createPlane(planesMenu.ArrowRightQuestions)
+        const backgroundanswers_entity = this.createPlane(planesMenu.BackgroundAnswers)
+        const backgroundcompicactus_entity = this.createPlane(planesMenu.BackgroundCompicactus)
+        const backgroundquestions_entity = this.createPlane(planesMenu.BackgroundQuestions)
+        const compiplaceholder_entity = this.createPlane(planesMenu.Compicactus)
+        const editanswer_entity = this.createPlane(planesMenu.EditAnswer)
+        const editname_entity = this.createPlane(planesMenu.EditName)
+        const name_entity = this.createPlane(planesMenu.Name)
+        const remove_entity = this.createPlane(planesMenu.Remove)
+        const selectedquestions_entity = this.createPlane(planesMenu.SelectedQuestion)
+
+        /*const arrowdown_entity = this.createPlane(planesMenu.ArrowDown)
         const arrowup_entity = this.createPlane(planesMenu.ArrowUp)
         const cargologo_entity = this.createPlane(planesMenu.CargoLogo)
         const dialogbackground_entity = this.createPlane(planesMenu.DialogBackground)
@@ -65,59 +108,58 @@ export class Stool extends Entity {
         const opensealogo_entity = this.createPlane(planesMenu.OpenSeaLogo)
         const polygonmana_entity = this.createPlane(planesMenu.PolygonMana)
         const remove_entity = this.createPlane(planesMenu.Remove)
-        const setname_entity = this.createPlane(planesMenu.SetName)
-
-        cargologo_entity.addComponent(
-            new OnPointerDown(() => {
-                openExternalURL("https://app.cargo.build")
-            },
-            {
-                hoverText: "Go to Cargo",
-            })
-        )
-
-        opensealogo_entity.addComponent(
-            new OnPointerDown(() => {
-                openExternalURL("https://opensea.io/")
-            },
-            {
-                hoverText: "Go to OpenSea",
-            })
-        )
-
-        help_entity.addComponent(
-            new OnPointerDown(() => {
-                openExternalURL("https://compicactus.com")
-            },
-            {
-                hoverText: "Go to Compicactus.com",
-            })
-        )
-
-        polygonmana_entity.addComponent(
-            new OnPointerDown(() => {
-                openExternalURL("https://account.decentraland.org/")
-            },
-            {
-                hoverText: "Get Polygon Mana",
-            })
-        )
+        const setname_entity = this.createPlane(planesMenu.SetName)*/
 
         // Compicactus
+        engine.removeEntity(compiplaceholder_entity)
         this.compi_entity = new Compicactus()
-        this.compi_entity.addComponent(new Transform({
-            position: new Vector3(0.05, 0.4, 0.02),
-            scale: new Vector3(0.8, 0.8, 0.8)
-        }))
+        this.compi_entity.addComponent(compiplaceholder_entity.getComponent(Transform))
         this.compi_entity.setParent(this)
-        this.compi_entity.addComponent(
+        this.compi_entity.getComponent(PlaneShape).uvs = compiplaceholder_entity.getComponent(PlaneShape).uvs
+
+        arrowrightcompi_entity.addComponent(
             new OnPointerDown(()=>{
-                // this.next(this)
                 this.stool_component.goto_compi += 1
             },
             {
-                hoverText: "Next Compi",
-                showFeedback: false
+                hoverText: "Next Compi"
+            })
+        )
+
+        arrowleftcompi_entity.addComponent(
+            new OnPointerDown(()=>{
+                this.stool_component.goto_compi -= 1
+            },
+            {
+                hoverText: "Next Compi"
+            })
+        )
+
+        editname_entity.addComponent(
+            new OnPointerDown(() => {this.setName(this)},
+            {
+                hoverText: "Set Name",
+            })
+        )
+
+        backgroundquestions_entity.addComponent(
+            new OnPointerDown(() => {this.askQuestion(this)},
+            {
+                hoverText: "Ask selected question",
+            })
+        )
+
+        addquestion_entity.addComponent(
+            new OnPointerDown(() => {this.addQuestion(this)},
+            {
+                hoverText: "Add question",
+            })
+        )
+
+        editanswer_entity.addComponent(
+            new OnPointerDown(() => {this.editAnwser(this)},
+            {
+                hoverText: "Edit answer",
             })
         )
 
@@ -131,8 +173,8 @@ export class Stool extends Entity {
         this.compidata_entity = new Entity()
         this.compidata_entity.addComponent(this.compidata_shape)
         this.compidata_entity.addComponent(new Transform({
-            position: new Vector3(0.53, -0.18, 0.02),
-            rotation: Quaternion.Euler(0, 180, 11.5),
+            position: new Vector3(0.3, -0.78, 0.08),
+            rotation: Quaternion.Euler(0, 180, 0),
             scale: new Vector3(0.4, 0.4, 0.4)
         }))
         this.compidata_entity.setParent(this)
@@ -150,7 +192,7 @@ export class Stool extends Entity {
         this.questions_entity = new Entity()
         this.questions_entity.addComponent(this.questions_shape)
         this.questions_entity.addComponent(new Transform({
-            position: new Vector3(-0.82, 0.27, 0.05),
+            position: new Vector3(1, 0.1, 0.08),
             rotation: Quaternion.Euler(0, 180, 0),
             scale: new Vector3(0.5, 0.5, 1)
         }))
@@ -170,34 +212,75 @@ export class Stool extends Entity {
         this.answer_entity = new Entity()
         this.answer_entity.addComponent(this.answer_shape)
         this.answer_entity.addComponent(new Transform({
-            position: new Vector3(0, -0.5, 0.01),
+            position: new Vector3(-1, 0.1, 0.08),
             rotation: Quaternion.Euler(0, 180, 0),
             scale: new Vector3(0.5, 0.5, 1)
         }))
         this.answer_entity.setParent(this)
 
-
-        // Price Text
-        this.price_shape.textWrapping = true
-        this.price_shape.font = new Font(Fonts.SanFrancisco_Heavy)
-        this.price_shape.hTextAlign = "center"
-        this.price_shape.vTextAlign = "top"
-        this.price_shape.fontSize = 1
-        this.price_shape.fontWeight = 'normal'
-        this.price_shape.value = "-"
-        this.price_shape.width = 1.5
-        this.price_shape.color = Color3.Black()
-        this.price_entity = new Entity()
-        this.price_entity.addComponent(this.price_shape)
-        this.price_entity.addComponent(new Transform({
-            position: new Vector3(0.7, 0.07, 0.05),
-            rotation: Quaternion.Euler(0, 180, 0),
-            scale: new Vector3(1, 1, 1)
-        }))
-        this.price_entity.setParent(this)
-
-
         this.stool_component.answer = "Testing!"
+
+        // Input Text
+        this.textInput.width = "50%"
+        this.textInput.height = "50px"
+        this.textInput.vAlign = "bottom"
+        this.textInput.hAlign = "center"
+        this.textInput.fontSize = 30
+        this.textInput.placeholder = "Write name here"
+        this.textInput.placeholderColor = Color4.Gray()
+        this.textInput.positionY = "200px"
+        this.textInput.isPointerBlocker = true
+        this.textInput.visible = false
+    }
+
+    addQuestion(self: Stool) {
+        const stool_component = self.getComponent(StoolComponent)
+        log("Add Questions")
+        if (stool_component.current_compi < 0) return
+
+        log("this.current_token", stool_component.current_token)
+
+        self.textInput.visible = true
+        self.textInput.placeholder = "Write question"
+
+        self.textInput.onTextSubmit = new OnTextSubmit((x) => {
+            self.textInput.visible = false
+            stool_component.question_to_add = x.text
+        })
+    }
+
+    setName(self: Stool) {
+        const stool_component = self.getComponent(StoolComponent)
+        log("Set Name")
+        if (stool_component.current_compi < 0) return
+
+        log("this.current_token", stool_component.current_token)
+
+        this.textInput.visible = true
+        this.textInput.placeholder = "Write name here"
+
+        this.textInput.onTextSubmit = new OnTextSubmit((x) => {
+            this.textInput.visible = false
+            stool_component.name_to_set = x.text
+        })
+    }
+
+    askQuestion(self: Stool) {
+        const stool_component = self.getComponent(StoolComponent)
+        if (stool_component.current_compi < 0) return
+        const question_text = stool_component.question_list[stool_component.selected_question].value
+        stool_component.asking_question = question_text
+    }
+
+    editAnwser(self: Stool) {
+        const stool_component = self.getComponent(StoolComponent)
+        if (stool_component.current_compi < 0) return
+        this.textInput.visible = true
+        this.textInput.placeholder = "Write answer here"
+        this.textInput.onTextSubmit = new OnTextSubmit((x) => {
+            this.textInput.visible = false
+            stool_component.answer_to_set = x.text
+        })
     }
 
     createPlane(data: any) {
@@ -211,29 +294,29 @@ export class Stool extends Entity {
             scale: new Vector3(...data.scale)
         }))
 
-        const myTexture = new Texture("textures/CompiUI.png")
-        const myMaterial = new Material()
-        myMaterial.transparencyMode = 1
-        myMaterial.albedoTexture = myTexture
         e.addComponent(myMaterial)
         e.setParent(this)
         return e
     }
 }
 
+
+
+
+
+
+// System
+
 const stoolGroup = engine.getComponentGroup(StoolComponent)
 
 export class StoolSystem implements ISystem {
+    working = false
+
     update(dt: number) {
         for (let entity of stoolGroup.entities) {
             let stool = entity as Stool
             const stool_component = entity.getComponent(StoolComponent)
-            if (stool_component.current_compi != stool_component.goto_compi) {
-                this.goto(stool_component)
-            }
-            if (stool_component.dirty) {
-                this.updateCompi(stool)
-            }
+
             if (stool_component.answer != stool.answer_shape.value) {
                 stool.answer_shape.value = stool_component.answer
                 stool.answer_shape.width = 1.5
@@ -242,24 +325,39 @@ export class StoolSystem implements ISystem {
                 stool.questions_shape.value = stool_component.questions
                 stool.questions_shape.width = 1.5
             }
-            if (stool_component.price == "-") {
-                this.updatePrice(stool_component)
+
+            if (this.working) continue
+            if (stool_component.current_compi != stool_component.goto_compi) {
+                this.working = true
+                this.goto(stool_component)
+                continue
             }
-            if (stool_component.price != stool.price_shape.value) {
-                stool.price_shape.value = stool_component.price
+            if (stool_component.dirty) {
+                this.working = true
+                this.updateCompi(stool)
+                continue
+            }
+            if (stool_component.name_to_set != "") {
+                this.working = true
+                this.setName(stool_component)
+                continue
+            }
+            if (stool_component.answer_to_set != "") {
+                this.working = true
+                this.editAnwser(stool_component)
+                continue
+            }
+            if (stool_component.question_to_add != "") {
+                this.working = true
+                this.addQuestion(stool_component)
+                continue
+            }
+            if (stool_component.asking_question != "") {
+                this.working = true
+                this.askQuestion(stool_component)
+                continue
             }
         }
-    }
-
-    async updatePrice(stool_component: StoolComponent) {
-        log("Getting price")
-        const price = await blockchain.getPrice()
-        log("this.current_price", price)
-        const price_human = eth.fromWei(price[0].toString(), 'ether')
-        log("price_human", price_human)
-        stool_component.price = price_human
-        stool_component.price_number = price[0]
-        stool_component.price_discount = price[1]
     }
 
     async goto(stool_component: StoolComponent) {
@@ -289,6 +387,8 @@ export class StoolSystem implements ISystem {
         }
 
         log(stool_component.goto_compi, stool_component.current_compi)
+
+        this.working = false
     }
 
     async updateCompi(entity: Stool) {
@@ -319,11 +419,69 @@ export class StoolSystem implements ISystem {
         let questions_text = ""
         for (let n=0; n < questions.length; n++) {
             questions_text += `${questions[n]}\n`
+            stool_component.question_list[n] = {
+                id: n+offset,
+                value: questions[n]
+            }
         }
 
         stool_component.questions = questions_text
+
+        this.working = false
+    }
+
+    async setName(stool_component: StoolComponent) {
+        await blockchain.setName(stool_component.current_token, stool_component.name_to_set).then(tx => {
+            stool_component.dirty = true
+            stool_component.name_to_set = ""
+            this.working = false
+            log("setName Ok ", tx)
+        }).catch(e => {
+            this.working = false
+            stool_component.name_to_set = ""
+            log("Error on setName", e)
+        })
+    }
+
+    async askQuestion(stool_component: StoolComponent) {
+        const answer = await blockchain.getAnswer(stool_component.current_token, stool_component.asking_question)
+        const answer_text = `You: ${stool_component.asking_question}\n\nCompi: ${answer}`
+        stool_component.answer = answer_text
+
+        this.working = false
+    }
+
+    async addQuestion(stool_component: StoolComponent) {
+        await blockchain.addQuestion(stool_component.current_token, stool_component.question_to_add, "Default answer").then(tx => {
+            stool_component.dirty = true
+            stool_component.question_to_add = ""
+            this.working = false
+            log("addQuestion Ok ", tx)
+        }).catch(e => {
+            this.working = false
+            stool_component.question_to_add = ""
+            log("Error on addQuestion", e)
+        })
+    }
+
+    async editAnwser(stool_component: StoolComponent) {
+        log("Edit Anwser")
+
+        log("this.current_token", stool_component.current_token)
+        const question = stool_component.question_list[stool_component.selected_question].value
+        await blockchain.addQuestion(stool_component.current_token, question, stool_component.answer_to_set).then(tx => {
+            stool_component.dirty = true
+            stool_component.answer_to_set = ""
+            this.working = false
+            log("addQuestion (Edit Anwser) Ok ", tx)
+        }).catch(e => {
+            this.working = false
+            stool_component.answer_to_set = ""
+            log("Error on addQuestion (Edit Anwser)", e)
+        })
     }
 }
+
 
 /*
 //Menu Shapes

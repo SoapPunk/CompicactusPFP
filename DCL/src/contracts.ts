@@ -248,6 +248,7 @@ export class Blockchain {
     }
 
     async setName(id:number, name:string) {
+        if (this.network == "mockup") return await this.mockupAnswer(0)
         const functionSetName = new eth.SolidityFunction(this.getFunction("setName", abiBrain));
         const functionSignature = functionSetName.toPayload([this.pfp_contract.address, id, name]);
         log(functionSignature)
@@ -255,6 +256,7 @@ export class Blockchain {
     }
 
     async addQuestion(id:number, question:string, answer:string) {
+        if (this.network == "mockup") return await this.mockupAnswer(0)
         const scene = "default"
         const functionSsetQuestion = new eth.SolidityFunction(this.getFunction("addQuestion", abiBrain));
         const functionSignature = functionSsetQuestion.toPayload([this.pfp_contract.address, id, scene, question, answer]);
@@ -263,6 +265,7 @@ export class Blockchain {
     }
 
     async getAnswer(id:number, question:string) {
+        if (this.network == "mockup") return await this.mockupAnswer("This is an answer")
         const scene = "default"
         return this.getFactory(
             this.brain_contract

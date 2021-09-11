@@ -11,10 +11,10 @@ executeTask(async () => {
   }
 })
 
-/*const building = new Entity()
+const building = new Entity()
 building.addComponent(new GLTFShape("models/Building.gltf"))
 building.addComponent(new Transform({
     position: new Vector3(8, 0, -8),
     rotation: Quaternion.Euler(0, 90, 0)
 }))
-engine.addEntity(building)*/
+engine.addEntity(building)

@@ -1,5 +1,5 @@
 import { Blockchain } from "./contracts"
-import { Stool } from "./stool"
+import { Stool, StoolComponent } from "./stool"
 import * as eth from "eth-connect"
 
 const setname_shape = new GLTFShape("models/setName.gltf")
@@ -8,7 +8,7 @@ const button_add_shape = new GLTFShape("models/button_add.gltf")
 const canvas = new UICanvas()
 const textInput = new UIInputText(canvas)
 
-const blockchain = new Blockchain("mumbai")
+const blockchain = new Blockchain("mockup")
 
 export class Teach {
     setname_entity: Entity = new Entity
@@ -26,7 +26,7 @@ export class Teach {
 
     activated = false
 
-    constructor(parent: Stool) {
+    constructor(parent: Stool, current_chain: string) {
         this.parent = parent
 
         setname_shape.visible = false
@@ -140,17 +140,18 @@ export class Teach {
     }
 
     async setName(self: Teach) {
+        const stool_component = self.parent.getComponent(StoolComponent)
         log("Set Name")
-        if (self.parent.current_compi < 0) return
+        if (stool_component.current_compi < 0) return
 
-        log("this.current_token", self.parent.current_token)
+        log("this.current_token", stool_component.current_token)
 
         textInput.visible = true
         textInput.placeholder = "Write name here"
 
         textInput.onTextSubmit = new OnTextSubmit(async (x) => {
             textInput.visible = false
-            await blockchain.setName(this.parent.current_token, x.text).then(tx => {
+            await blockchain.setName(stool_component.current_token, x.text).then(tx => {
                 log("setName Ok ", tx)
             }).catch(e => {
                 log("Error on setName", e)
@@ -159,10 +160,11 @@ export class Teach {
     }
 
     async addQuestion(self: Teach) {
+        const stool_component = self.parent.getComponent(StoolComponent)
         log("Add Questions")
-        if (self.parent.current_compi < 0) return
+        if (stool_component.current_compi < 0) return
 
-        log("this.current_token", self.parent.current_token)
+        log("this.current_token", stool_component.current_token)
 
         textInput.visible = true
         textInput.placeholder = "Write question"
@@ -176,7 +178,7 @@ export class Teach {
                 textInput.visible = false
                 this.adding_answer = x.text
 
-                await blockchain.addQuestion(this.parent.current_token, this.adding_question, this.adding_answer).then(tx => {
+                await blockchain.addQuestion(stool_component.current_token, this.adding_question, this.adding_answer).then(tx => {
                     log("addQuestion Ok ", tx)
                 }).catch(e => {
                     log("Error on addQuestion", e)
@@ -186,12 +188,13 @@ export class Teach {
     }
 
     async editQuestion(self: Teach, n: number) {
+        const stool_component = self.parent.getComponent(StoolComponent)
         log("Add Questions")
-        if (self.parent.current_compi < 0) return
+        if (stool_component.current_compi < 0) return
 
-        log("this.current_token", self.parent.current_token)
+        log("this.current_token", stool_component.current_token)
 
-        const text = await blockchain.getAnswer(this.parent.current_token, this.question_list[n].value)
+        const text = await blockchain.getAnswer(stool_component.current_token, this.question_list[n].value)
 
         textInput.visible = true
         textInput.placeholder = text
@@ -199,7 +202,7 @@ export class Teach {
         textInput.onTextSubmit = new OnTextSubmit(async (x) => {
             textInput.visible = false
 
-            await blockchain.addQuestion(this.parent.current_token, this.question_list[n].value, x.text).then(tx => {
+            await blockchain.addQuestion(stool_component.current_token, this.question_list[n].value, x.text).then(tx => {
                 log("addQuestion Ok ", tx)
             }).catch(e => {
                 log("Error on addQuestion", e)
@@ -208,8 +211,9 @@ export class Teach {
     }
 
     async askQuestion(self: Teach, n: number) {
+        const stool_component = self.parent.getComponent(StoolComponent)
         const question_text = this.question_list[n].value
-        const answer = await blockchain.getAnswer(this.parent.current_token, question_text)
+        const answer = await blockchain.getAnswer(stool_component.current_token, question_text)
         const answer_text = `You: ${question_text}\n\nCompi: ${answer}`
         this.parent.setAnswer(answer_text)
         this.parent.compi_entity.play_random()
