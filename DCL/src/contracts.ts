@@ -203,7 +203,7 @@ export class Blockchain {
 
     // PFP
     async balanceOf() {
-        if (this.network == "mockup") return await this.mockupAnswer(4)
+        if (this.network == "mockup") return await this.mockupAnswer(3)
         const publicKeyRequest = await getUserPublicKey()
 
         log("publicKeyRequest", publicKeyRequest)

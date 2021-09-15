@@ -7,6 +7,7 @@ import * as eth from "eth-connect"
 import planesMenu from "./planesMenuB"
 
 const current_chain = "mumbai"
+//const current_chain = "mockup"
 const blockchain = new Blockchain(current_chain)
 
 
@@ -31,7 +32,7 @@ export class StoolComponent {
     goto_compi: number = -1
     dirty: boolean = false
 
-    answer: string = "Test answer!"
+    answer: string = ""
     questions: string = ""
     name: string = ""
 
@@ -40,12 +41,17 @@ export class StoolComponent {
     price_discount: boolean = false
 
     question_list: Array<{id: number, value: string}> = []
-    selected_question: number = 0
+    current_question: number = 0
+    goto_question: number = 0
 
     name_to_set: string = ""
     answer_to_set: string = ""
     question_to_add: string = ""
     asking_question: string = ""
+
+    current_action: string = ""
+
+    forced: boolean = false
 }
 
 export class Stool extends Entity {
@@ -60,55 +66,82 @@ export class Stool extends Entity {
     questions_entity: Entity
     questions_shape: TextShape = new TextShape()
 
-    //price_entity: Entity
-    //price_shape: TextShape = new TextShape()
-
     stool_component: StoolComponent
 
     textInput:UIInputText
-    //teach: Teach
 
-    constructor() {
+    constructor(id: number = -1) {
         super()
-
-        //this.teach = new Teach(this, current_chain)
 
         this.textInput = new UIInputText(canvas)
 
-        this.addComponent(new Transform({
-            position: new Vector3(8, 1.5, 8)
-        }))
         this.stool_component = new StoolComponent()
         this.addComponent(this.stool_component)
         engine.addEntity(this)
 
-        const addquestion_entity = this.createPlane(planesMenu.Add)
-        const arrowleftcompi_entity = this.createPlane(planesMenu.ArrowLeftCompi)
+        if (id != -1) {
+            this.stool_component.forced = true
+            this.stool_component.goto_compi = id
+            this.stool_component.dirty = true
+            log("Forced")
+        }
+
+        if (!this.stool_component.forced) {
+            const arrowleftcompi_entity = this.createPlane(planesMenu.ArrowLeftCompi)
+            arrowleftcompi_entity.addComponent(
+                new OnPointerDown(()=>{
+                    this.stool_component.current_action = "previous_compi"
+                },
+                {
+                    hoverText: "Next Compi"
+                })
+            )
+            const arrowrightcompi_entity = this.createPlane(planesMenu.ArrowRightCompi)
+            arrowrightcompi_entity.addComponent(
+                new OnPointerDown(()=>{
+                    this.stool_component.current_action = "next_compi"
+                },
+                {
+                    hoverText: "Next Compi"
+                })
+            )
+            const addquestion_entity = this.createPlane(planesMenu.Add)
+            addquestion_entity.addComponent(
+                new OnPointerDown(() => {
+                    this.stool_component.current_action = "add_question"
+                },
+                {
+                    hoverText: "Add question",
+                })
+            )
+            const editanswer_entity = this.createPlane(planesMenu.EditAnswer)
+            editanswer_entity.addComponent(
+                new OnPointerDown(() => {
+                    this.stool_component.current_action = "edit_answer"
+                },
+                {
+                    hoverText: "Edit answer",
+                })
+            )
+            const editname_entity = this.createPlane(planesMenu.EditName)
+            editname_entity.addComponent(
+                new OnPointerDown(() => {
+                    this.stool_component.current_action = "set_name"
+                },
+                {
+                    hoverText: "Set Name",
+                })
+            )
+            const remove_entity = this.createPlane(planesMenu.Remove)
+        }
         const arrowleftquestions_entity = this.createPlane(planesMenu.ArrowLeftQuestions)
-        const arrowrightcompi_entity = this.createPlane(planesMenu.ArrowRightCompi)
         const arrowrightquestions_entity = this.createPlane(planesMenu.ArrowRightQuestions)
         const backgroundanswers_entity = this.createPlane(planesMenu.BackgroundAnswers)
         const backgroundcompicactus_entity = this.createPlane(planesMenu.BackgroundCompicactus)
         const backgroundquestions_entity = this.createPlane(planesMenu.BackgroundQuestions)
         const compiplaceholder_entity = this.createPlane(planesMenu.Compicactus)
-        const editanswer_entity = this.createPlane(planesMenu.EditAnswer)
-        const editname_entity = this.createPlane(planesMenu.EditName)
-        const name_entity = this.createPlane(planesMenu.Name)
-        const remove_entity = this.createPlane(planesMenu.Remove)
         const selectedquestions_entity = this.createPlane(planesMenu.SelectedQuestion)
-
-        /*const arrowdown_entity = this.createPlane(planesMenu.ArrowDown)
-        const arrowup_entity = this.createPlane(planesMenu.ArrowUp)
-        const cargologo_entity = this.createPlane(planesMenu.CargoLogo)
-        const dialogbackground_entity = this.createPlane(planesMenu.DialogBackground)
-        const edit_entity = this.createPlane(planesMenu.Edit)
-        const help_entity = this.createPlane(planesMenu.Help)
-        const mainbackground_entity = this.createPlane(planesMenu.MainBackground)
-        const mint_entity = this.createPlane(planesMenu.Mint)
-        const opensealogo_entity = this.createPlane(planesMenu.OpenSeaLogo)
-        const polygonmana_entity = this.createPlane(planesMenu.PolygonMana)
-        const remove_entity = this.createPlane(planesMenu.Remove)
-        const setname_entity = this.createPlane(planesMenu.SetName)*/
+        const name_entity = this.createPlane(planesMenu.Name)
 
         // Compicactus
         engine.removeEntity(compiplaceholder_entity)
@@ -117,49 +150,18 @@ export class Stool extends Entity {
         this.compi_entity.setParent(this)
         this.compi_entity.getComponent(PlaneShape).uvs = compiplaceholder_entity.getComponent(PlaneShape).uvs
 
-        arrowrightcompi_entity.addComponent(
-            new OnPointerDown(()=>{
-                this.stool_component.goto_compi += 1
-            },
-            {
-                hoverText: "Next Compi"
-            })
-        )
-
-        arrowleftcompi_entity.addComponent(
-            new OnPointerDown(()=>{
-                this.stool_component.goto_compi -= 1
-            },
-            {
-                hoverText: "Next Compi"
-            })
-        )
-
-        editname_entity.addComponent(
-            new OnPointerDown(() => {this.setName(this)},
-            {
-                hoverText: "Set Name",
-            })
-        )
-
         backgroundquestions_entity.addComponent(
-            new OnPointerDown(() => {this.askQuestion(this)},
+            new OnPointerDown((e) => {
+                if (e.buttonId == 0) {
+                    this.stool_component.current_action = "ask_question"
+                } else if (e.buttonId == 1) {
+                    this.stool_component.current_action = "previous_question"
+                } else if (e.buttonId == 2) {
+                    this.stool_component.current_action = "next_question"
+                }
+            },
             {
                 hoverText: "Ask selected question",
-            })
-        )
-
-        addquestion_entity.addComponent(
-            new OnPointerDown(() => {this.addQuestion(this)},
-            {
-                hoverText: "Add question",
-            })
-        )
-
-        editanswer_entity.addComponent(
-            new OnPointerDown(() => {this.editAnwser(this)},
-            {
-                hoverText: "Edit answer",
             })
         )
 
@@ -218,8 +220,6 @@ export class Stool extends Entity {
         }))
         this.answer_entity.setParent(this)
 
-        this.stool_component.answer = "Testing!"
-
         // Input Text
         this.textInput.width = "50%"
         this.textInput.height = "50px"
@@ -231,56 +231,6 @@ export class Stool extends Entity {
         this.textInput.positionY = "200px"
         this.textInput.isPointerBlocker = true
         this.textInput.visible = false
-    }
-
-    addQuestion(self: Stool) {
-        const stool_component = self.getComponent(StoolComponent)
-        log("Add Questions")
-        if (stool_component.current_compi < 0) return
-
-        log("this.current_token", stool_component.current_token)
-
-        self.textInput.visible = true
-        self.textInput.placeholder = "Write question"
-
-        self.textInput.onTextSubmit = new OnTextSubmit((x) => {
-            self.textInput.visible = false
-            stool_component.question_to_add = x.text
-        })
-    }
-
-    setName(self: Stool) {
-        const stool_component = self.getComponent(StoolComponent)
-        log("Set Name")
-        if (stool_component.current_compi < 0) return
-
-        log("this.current_token", stool_component.current_token)
-
-        this.textInput.visible = true
-        this.textInput.placeholder = "Write name here"
-
-        this.textInput.onTextSubmit = new OnTextSubmit((x) => {
-            this.textInput.visible = false
-            stool_component.name_to_set = x.text
-        })
-    }
-
-    askQuestion(self: Stool) {
-        const stool_component = self.getComponent(StoolComponent)
-        if (stool_component.current_compi < 0) return
-        const question_text = stool_component.question_list[stool_component.selected_question].value
-        stool_component.asking_question = question_text
-    }
-
-    editAnwser(self: Stool) {
-        const stool_component = self.getComponent(StoolComponent)
-        if (stool_component.current_compi < 0) return
-        this.textInput.visible = true
-        this.textInput.placeholder = "Write answer here"
-        this.textInput.onTextSubmit = new OnTextSubmit((x) => {
-            this.textInput.visible = false
-            stool_component.answer_to_set = x.text
-        })
     }
 
     createPlane(data: any) {
@@ -327,62 +277,92 @@ export class StoolSystem implements ISystem {
             }
 
             if (this.working) continue
-            if (stool_component.current_compi != stool_component.goto_compi) {
-                this.working = true
-                this.goto(stool_component)
-                continue
-            }
             if (stool_component.dirty) {
                 this.working = true
+                log("Working on: updateCompi")
                 this.updateCompi(stool)
                 continue
             }
-            if (stool_component.name_to_set != "") {
+            if (stool_component.current_action == "previous_compi") {
                 this.working = true
-                this.setName(stool_component)
+                stool_component.current_action = ""
+                stool_component.goto_compi -= 1
+                this.goto(stool_component)
                 continue
             }
-            if (stool_component.answer_to_set != "") {
+            if (stool_component.current_action == "next_compi") {
                 this.working = true
-                this.editAnwser(stool_component)
+                stool_component.current_action = ""
+                stool_component.goto_compi += 1
+                this.goto(stool_component)
                 continue
             }
-            if (stool_component.question_to_add != "") {
+            if (stool_component.current_action == "add_question") {
                 this.working = true
-                this.addQuestion(stool_component)
+                stool_component.current_action = ""
+                this.addQuestion(entity as Stool)
                 continue
             }
-            if (stool_component.asking_question != "") {
+            if (stool_component.current_action == "edit_answer") {
                 this.working = true
+                stool_component.current_action = ""
+                this.editAnwser(entity as Stool)
+                continue
+            }
+            if (stool_component.current_action == "set_name") {
+                this.working = true
+                stool_component.current_action = ""
+                this.setName(entity as Stool)
+                continue
+            }
+            if (stool_component.current_action == "ask_question") {
+                this.working = true
+                stool_component.current_action = ""
                 this.askQuestion(stool_component)
+                continue
+            }
+            if (stool_component.current_action == "previous_question") {
+                this.working = true
+                stool_component.current_action = ""
+                stool_component.goto_question -= 1
+                this.gotoQuestion(stool_component)
+                continue
+            }
+            if (stool_component.current_action == "next_question") {
+                this.working = true
+                stool_component.current_action = ""
+                stool_component.goto_question += 1
+                this.gotoQuestion(stool_component)
                 continue
             }
         }
     }
 
     async goto(stool_component: StoolComponent) {
-        log("Getting compis")
+        log("goto")
+        if(!stool_component.forced) {
+            log("Getting compis")
+            const compisCount = await blockchain.balanceOf()
 
-        const compisCount = await blockchain.balanceOf()
-
-        if (compisCount>0) {
-            if (stool_component.goto_compi<0) {
-                stool_component.current_compi = compisCount
-                stool_component.goto_compi = compisCount
-
+            if (compisCount>0) {
+                if (stool_component.goto_compi<0) {
+                    stool_component.current_compi = compisCount-1
+                    stool_component.goto_compi = compisCount-1
+                    stool_component.dirty = true
+                } else if (stool_component.goto_compi>=compisCount) {
+                    stool_component.current_compi = 0
+                    stool_component.goto_compi = 0
+                    stool_component.dirty = true
+                }
+                stool_component.current_compi = stool_component.goto_compi
                 stool_component.dirty = true
-            } else if (stool_component.goto_compi>=compisCount) {
-                stool_component.current_compi = 0
-                stool_component.goto_compi = 0
-
+            } else {
+                stool_component.goto_compi = -1
+                stool_component.current_compi = -1
                 stool_component.dirty = true
             }
-            stool_component.current_compi = stool_component.goto_compi
-            stool_component.dirty = true
         } else {
-            stool_component.goto_compi = -1
-            stool_component.current_compi = -1
-
+            stool_component.current_compi = stool_component.goto_compi
             stool_component.dirty = true
         }
 
@@ -391,22 +371,53 @@ export class StoolSystem implements ISystem {
         this.working = false
     }
 
+    async gotoQuestion(stool_component: StoolComponent) {
+        let questions_count: number = 0
+        for (let n=0; n < stool_component.question_list.length; n++) {
+            if (stool_component.question_list[n].value != "") {
+                questions_count += 1
+            }
+        }
+        if (stool_component.goto_question < 0) {
+            stool_component.goto_question = questions_count-1
+            stool_component.current_question = questions_count-1
+            stool_component.dirty = true
+        } else if (stool_component.goto_question >= questions_count) {
+            stool_component.goto_question = 0
+            stool_component.current_question = 0
+            stool_component.dirty = true
+        } else {
+            stool_component.current_question = stool_component.goto_question
+            stool_component.dirty = true
+        }
+
+        log(stool_component.goto_question, stool_component.current_question)
+
+        this.working = false
+    }
+
     async updateCompi(entity: Stool) {
         const stool_component = entity.getComponent(StoolComponent)
         stool_component.dirty = false
-        if (stool_component.current_compi < 0) return
+        if (stool_component.current_compi < 0) {
+            this.working = false
+            return
+        }
 
         entity.compidata_shape.value = "-"
 
-        const compiId = await blockchain.tokenOfOwnerByIndex(stool_component.current_compi)
+        let compiId: number = 0
+        if(!stool_component.forced) {
+            compiId = await blockchain.tokenOfOwnerByIndex(stool_component.current_compi)
 
-        stool_component.current_token = compiId
-
+            stool_component.current_token = compiId
+        } else {
+            compiId = stool_component.current_token = stool_component.current_compi
+        }
+        log("compiId", compiId)
         const compiName = await blockchain.getName(compiId)
 
         entity.compidata_shape.value = compiId + ":" + compiName
-
-        //this.teach.getQuestions()
 
         entity.compi_entity.set_mp4_body(stool_component.current_compi)
 
@@ -418,6 +429,9 @@ export class StoolSystem implements ISystem {
 
         let questions_text = ""
         for (let n=0; n < questions.length; n++) {
+            if (stool_component.current_question == n) {
+                questions_text += "> "
+            }
             questions_text += `${questions[n]}\n`
             stool_component.question_list[n] = {
                 id: n+offset,
@@ -430,55 +444,82 @@ export class StoolSystem implements ISystem {
         this.working = false
     }
 
-    async setName(stool_component: StoolComponent) {
-        await blockchain.setName(stool_component.current_token, stool_component.name_to_set).then(tx => {
-            stool_component.dirty = true
-            stool_component.name_to_set = ""
-            this.working = false
-            log("setName Ok ", tx)
-        }).catch(e => {
-            this.working = false
-            stool_component.name_to_set = ""
-            log("Error on setName", e)
+    async setName(entity: Stool) {
+        const stool_component = entity.getComponent(StoolComponent)
+        log("Set Name")
+        if (stool_component.current_compi < 0) return
+
+        entity.textInput.visible = true
+        entity.textInput.placeholder = "Write name here"
+
+        entity.textInput.onTextSubmit = new OnTextSubmit(async (x) => {
+            entity.textInput.visible = false
+
+            await blockchain.setName(stool_component.current_token, x.text).then(tx => {
+                stool_component.dirty = true
+                this.working = false
+                log("setName Ok ", tx)
+            }).catch(e => {
+                this.working = false
+                log("Error on setName", e)
+            })
         })
+
+
     }
 
     async askQuestion(stool_component: StoolComponent) {
-        const answer = await blockchain.getAnswer(stool_component.current_token, stool_component.asking_question)
-        const answer_text = `You: ${stool_component.asking_question}\n\nCompi: ${answer}`
+        const question_text = stool_component.question_list[stool_component.current_question].value
+        const answer = await blockchain.getAnswer(stool_component.current_token, question_text)
+        const answer_text = `You: ${question_text}\n\nCompi: ${answer}`
         stool_component.answer = answer_text
 
         this.working = false
     }
 
-    async addQuestion(stool_component: StoolComponent) {
-        await blockchain.addQuestion(stool_component.current_token, stool_component.question_to_add, "Default answer").then(tx => {
-            stool_component.dirty = true
-            stool_component.question_to_add = ""
-            this.working = false
-            log("addQuestion Ok ", tx)
-        }).catch(e => {
-            this.working = false
-            stool_component.question_to_add = ""
-            log("Error on addQuestion", e)
+    async addQuestion(entity: Stool) {
+        const stool_component = entity.getComponent(StoolComponent)
+        entity.textInput.visible = true
+        entity.textInput.placeholder = "Write question"
+
+        entity.textInput.onTextSubmit = new OnTextSubmit(async (x) => {
+            entity.textInput.visible = false
+
+            await blockchain.addQuestion(stool_component.current_token, x.text, "Default answer").then(tx => {
+                stool_component.dirty = true
+                this.working = false
+                log("addQuestion Ok ", tx)
+            }).catch(e => {
+                this.working = false
+                log("Error on addQuestion", e)
+            })
         })
+
+
     }
 
-    async editAnwser(stool_component: StoolComponent) {
+    async editAnwser(entity: Stool) {
+        const stool_component = entity.getComponent(StoolComponent)
         log("Edit Anwser")
 
-        log("this.current_token", stool_component.current_token)
-        const question = stool_component.question_list[stool_component.selected_question].value
-        await blockchain.addQuestion(stool_component.current_token, question, stool_component.answer_to_set).then(tx => {
-            stool_component.dirty = true
-            stool_component.answer_to_set = ""
-            this.working = false
-            log("addQuestion (Edit Anwser) Ok ", tx)
-        }).catch(e => {
-            this.working = false
-            stool_component.answer_to_set = ""
-            log("Error on addQuestion (Edit Anwser)", e)
+        entity.textInput.visible = true
+        entity.textInput.placeholder = "Write answer here"
+        entity.textInput.onTextSubmit = new OnTextSubmit(async (x) => {
+            entity.textInput.visible = false
+
+            log("this.current_token", stool_component.current_token)
+            const question = stool_component.question_list[stool_component.current_question].value
+            await blockchain.addQuestion(stool_component.current_token, question, x.text).then(tx => {
+                stool_component.dirty = true
+                this.working = false
+                log("addQuestion (Edit Anwser) Ok ", tx)
+            }).catch(e => {
+                this.working = false
+                log("Error on addQuestion (Edit Anwser)", e)
+            })
         })
+
+
     }
 }
 
