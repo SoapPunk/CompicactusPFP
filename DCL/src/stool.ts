@@ -30,7 +30,9 @@ export class StoolComponent {
     current_menu: number = 0
 
     goto_compi: number = -1
-    dirty: boolean = false
+    dirty_compi: boolean = false
+
+    play_animation: number = -1
 
     answer: string = ""
     questions: string = ""
@@ -41,6 +43,8 @@ export class StoolComponent {
     price_discount: boolean = false
 
     question_list: Array<{id: number, value: string}> = []
+    current_qpage: number = 0
+    goto_qpage: number = 0
     current_question: number = 0
     goto_question: number = 0
 
@@ -48,6 +52,8 @@ export class StoolComponent {
     answer_to_set: string = ""
     question_to_add: string = ""
     asking_question: string = ""
+
+    dirty_questions: boolean = false
 
     current_action: string = ""
 
@@ -66,6 +72,9 @@ export class Stool extends Entity {
     questions_entity: Entity
     questions_shape: TextShape = new TextShape()
 
+    arrowleftquestions_entity: Entity
+    arrowrightquestions_entity: Entity
+
     stool_component: StoolComponent
 
     textInput:UIInputText
@@ -81,8 +90,9 @@ export class Stool extends Entity {
 
         if (id != -1) {
             this.stool_component.forced = true
+            this.stool_component.current_action = "goto_compi"
             this.stool_component.goto_compi = id
-            this.stool_component.dirty = true
+            this.stool_component.dirty_compi = true
             log("Forced")
         }
 
@@ -134,8 +144,24 @@ export class Stool extends Entity {
             )
             const remove_entity = this.createPlane(planesMenu.Remove)
         }
-        const arrowleftquestions_entity = this.createPlane(planesMenu.ArrowLeftQuestions)
-        const arrowrightquestions_entity = this.createPlane(planesMenu.ArrowRightQuestions)
+        this.arrowleftquestions_entity = this.createPlane(planesMenu.ArrowLeftQuestions)
+        this.arrowleftquestions_entity.addComponent(
+            new OnPointerDown((e) => {
+                this.stool_component.current_action = "previous_question_page"
+            },
+            {
+                hoverText: "Prev page",
+            })
+        )
+        this.arrowrightquestions_entity = this.createPlane(planesMenu.ArrowRightQuestions)
+        this.arrowrightquestions_entity.addComponent(
+            new OnPointerDown((e) => {
+                this.stool_component.current_action = "next_question_page"
+            },
+            {
+                hoverText: "Next page",
+            })
+        )
         const backgroundanswers_entity = this.createPlane(planesMenu.BackgroundAnswers)
         const backgroundcompicactus_entity = this.createPlane(planesMenu.BackgroundCompicactus)
         const backgroundquestions_entity = this.createPlane(planesMenu.BackgroundQuestions)
@@ -275,25 +301,39 @@ export class StoolSystem implements ISystem {
                 stool.questions_shape.value = stool_component.questions
                 stool.questions_shape.width = 1.5
             }
+            if (stool_component.play_animation >= 0) {
+                stool.compi_entity.set_mp4_body(stool_component.current_token, stool_component.play_animation)
+                stool_component.play_animation = -1
+            }
 
             if (this.working) continue
-            if (stool_component.dirty) {
+            if (stool_component.dirty_compi) {
                 this.working = true
-                log("Working on: updateCompi")
                 this.updateCompi(stool)
+                continue
+            }
+            if (stool_component.dirty_questions) {
+                this.working = true
+                this.updateQuestions(stool)
                 continue
             }
             if (stool_component.current_action == "previous_compi") {
                 this.working = true
                 stool_component.current_action = ""
-                stool_component.goto_compi -= 1
+                stool_component.goto_compi = stool_component.current_compi - 1
                 this.goto(stool_component)
                 continue
             }
             if (stool_component.current_action == "next_compi") {
                 this.working = true
                 stool_component.current_action = ""
-                stool_component.goto_compi += 1
+                stool_component.goto_compi = stool_component.current_compi + 1
+                this.goto(stool_component)
+                continue
+            }
+            if (stool_component.current_action == "goto_compi") {
+                this.working = true
+                stool_component.current_action = ""
                 this.goto(stool_component)
                 continue
             }
@@ -324,15 +364,31 @@ export class StoolSystem implements ISystem {
             if (stool_component.current_action == "previous_question") {
                 this.working = true
                 stool_component.current_action = ""
-                stool_component.goto_question -= 1
+                stool_component.goto_question = stool_component.current_question - 1
                 this.gotoQuestion(stool_component)
                 continue
             }
             if (stool_component.current_action == "next_question") {
                 this.working = true
                 stool_component.current_action = ""
-                stool_component.goto_question += 1
+                stool_component.goto_question = stool_component.current_question + 1
                 this.gotoQuestion(stool_component)
+                continue
+            }
+            if (stool_component.current_action == "previous_question_page") {
+                log("action: previous_question_page")
+                this.working = true
+                stool_component.current_action = ""
+                stool_component.goto_qpage = stool_component.current_qpage - 1
+                this.gotoQPage(stool_component)
+                continue
+            }
+            if (stool_component.current_action == "next_question_page") {
+                log("action: next_question_page")
+                this.working = true
+                stool_component.current_action = ""
+                stool_component.goto_qpage = stool_component.current_qpage + 1
+                this.gotoQPage(stool_component)
                 continue
             }
         }
@@ -347,23 +403,23 @@ export class StoolSystem implements ISystem {
             if (compisCount>0) {
                 if (stool_component.goto_compi<0) {
                     stool_component.current_compi = compisCount-1
-                    stool_component.goto_compi = compisCount-1
-                    stool_component.dirty = true
+                    //stool_component.goto_compi = compisCount-1
+                    stool_component.dirty_compi = true
                 } else if (stool_component.goto_compi>=compisCount) {
                     stool_component.current_compi = 0
-                    stool_component.goto_compi = 0
-                    stool_component.dirty = true
+                    //stool_component.goto_compi = 0
+                    stool_component.dirty_compi = true
                 }
                 stool_component.current_compi = stool_component.goto_compi
-                stool_component.dirty = true
+                stool_component.dirty_compi = true
             } else {
                 stool_component.goto_compi = -1
                 stool_component.current_compi = -1
-                stool_component.dirty = true
+                stool_component.dirty_compi = true
             }
         } else {
             stool_component.current_compi = stool_component.goto_compi
-            stool_component.dirty = true
+            stool_component.dirty_compi = true
         }
 
         log(stool_component.goto_compi, stool_component.current_compi)
@@ -381,14 +437,14 @@ export class StoolSystem implements ISystem {
         if (stool_component.goto_question < 0) {
             stool_component.goto_question = questions_count-1
             stool_component.current_question = questions_count-1
-            stool_component.dirty = true
+            stool_component.dirty_questions = true
         } else if (stool_component.goto_question >= questions_count) {
             stool_component.goto_question = 0
             stool_component.current_question = 0
-            stool_component.dirty = true
+            stool_component.dirty_questions = true
         } else {
             stool_component.current_question = stool_component.goto_question
-            stool_component.dirty = true
+            stool_component.dirty_questions = true
         }
 
         log(stool_component.goto_question, stool_component.current_question)
@@ -396,9 +452,43 @@ export class StoolSystem implements ISystem {
         this.working = false
     }
 
-    async updateCompi(entity: Stool) {
+    async gotoQPage(stool_component: StoolComponent) {
+        let questions_count: number = 0
+        for (let n=0; n < stool_component.question_list.length; n++) {
+            if (stool_component.question_list[n].value != "") {
+                questions_count += 1
+            }
+        }
+
+        if (stool_component.goto_qpage < 0) {
+            stool_component.current_qpage = 0
+        } else if (stool_component.goto_qpage > 0 && questions_count < 10) {
+            stool_component.current_qpage = 0
+        } else {
+            stool_component.current_qpage = stool_component.goto_qpage
+        }
+
+        log("current_qpage", stool_component.current_qpage)
+        const offset = stool_component.current_qpage * 10
+        const questions = await blockchain.getQuestions(stool_component.current_token, offset)
+        log(questions)
+
+        for (let n=0; n < questions.length; n++) {
+            stool_component.question_list[n] = {
+                id: n+offset,
+                value: questions[n]
+            }
+        }
+
+        stool_component.current_question = 0
+
+        stool_component.dirty_questions = true
+        this.working = false
+    }
+
+    async updateCompi(entity: Stool, update_picture: boolean = true) {
         const stool_component = entity.getComponent(StoolComponent)
-        stool_component.dirty = false
+        stool_component.dirty_compi = false
         if (stool_component.current_compi < 0) {
             this.working = false
             return
@@ -419,28 +509,52 @@ export class StoolSystem implements ISystem {
 
         entity.compidata_shape.value = compiId + ":" + compiName
 
-        entity.compi_entity.set_mp4_body(stool_component.current_compi)
+        entity.compi_entity.set_mp4_body(compiId)
 
         // Get questions
 
-        const offset = 0
-        const questions = await blockchain.getQuestions(stool_component.current_token, offset)
-        log(questions)
+        this.gotoQPage(stool_component)
+
+        this.working = false
+    }
+
+    async updateQuestions(entity: Stool) {
+        const stool_component = entity.getComponent(StoolComponent)
+        const questionCount = await blockchain.getQuestionsCount(stool_component.current_token)
+
+        entity.arrowleftquestions_entity.getComponent(PlaneShape).visible = true
+        entity.arrowrightquestions_entity.getComponent(PlaneShape).visible = true
+
+        if (questionCount > 10) {
+            const min = stool_component.current_qpage * 10
+            const max = (stool_component.current_qpage * 10) + 10
+            if (min == 0) {
+                entity.arrowleftquestions_entity.getComponent(PlaneShape).visible = false
+            }
+        } else {
+            log("hide arrows")
+            entity.arrowleftquestions_entity.getComponent(PlaneShape).visible = false
+            entity.arrowrightquestions_entity.getComponent(PlaneShape).visible = false
+        }
 
         let questions_text = ""
-        for (let n=0; n < questions.length; n++) {
+        let questions_count: number = 0
+        for (let n=0; n < stool_component.question_list.length; n++) {
             if (stool_component.current_question == n) {
                 questions_text += "> "
             }
-            questions_text += `${questions[n]}\n`
-            stool_component.question_list[n] = {
-                id: n+offset,
-                value: questions[n]
+            questions_text += `${stool_component.question_list[n].value}\n`
+            if (stool_component.question_list[n].value != "") {
+                questions_count += 1
             }
         }
-
         stool_component.questions = questions_text
 
+        if (questions_count < 10) {
+            entity.arrowrightquestions_entity.getComponent(PlaneShape).visible = false
+        }
+
+        stool_component.dirty_questions = false
         this.working = false
     }
 
@@ -456,7 +570,7 @@ export class StoolSystem implements ISystem {
             entity.textInput.visible = false
 
             await blockchain.setName(stool_component.current_token, x.text).then(tx => {
-                stool_component.dirty = true
+                stool_component.dirty_compi = true
                 this.working = false
                 log("setName Ok ", tx)
             }).catch(e => {
@@ -473,7 +587,8 @@ export class StoolSystem implements ISystem {
         const answer = await blockchain.getAnswer(stool_component.current_token, question_text)
         const answer_text = `You: ${question_text}\n\nCompi: ${answer}`
         stool_component.answer = answer_text
-
+        const clip_id = Math.floor(Math.random()*11)
+        stool_component.play_animation = clip_id
         this.working = false
     }
 
@@ -486,7 +601,7 @@ export class StoolSystem implements ISystem {
             entity.textInput.visible = false
 
             await blockchain.addQuestion(stool_component.current_token, x.text, "Default answer").then(tx => {
-                stool_component.dirty = true
+                stool_component.dirty_compi = true
                 this.working = false
                 log("addQuestion Ok ", tx)
             }).catch(e => {
@@ -510,7 +625,7 @@ export class StoolSystem implements ISystem {
             log("this.current_token", stool_component.current_token)
             const question = stool_component.question_list[stool_component.current_question].value
             await blockchain.addQuestion(stool_component.current_token, question, x.text).then(tx => {
-                stool_component.dirty = true
+                stool_component.dirty_compi = true
                 this.working = false
                 log("addQuestion (Edit Anwser) Ok ", tx)
             }).catch(e => {

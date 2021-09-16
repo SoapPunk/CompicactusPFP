@@ -197,7 +197,7 @@ export class Compicactus extends Entity {
 
         const action = compi_actions[animation]
         const myVideoClip = new VideoClip(
-          `mp4/${id}/${id}_${action}.mp4`
+          `https://ipfs.io/ipfs/QmTVYczLEQhkPSBZx5ZVdkaU5xGNxpV4nTVciUQhCq17Em/${id}/${id}_${action}.mp4`
         )
         const myVideoTexture = new VideoTexture(myVideoClip)
 

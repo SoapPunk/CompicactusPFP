@@ -238,12 +238,13 @@ export class Blockchain {
         })
     }
 
-    async getQuestionsCount() {
-
+    async getQuestionsCount(id:number) {
+        if (this.network == "mockup") return await this.mockupAnswer(20)
+        const scene = "default"
         return this.getFactory(
             this.brain_contract
         ).then(async ( contract: any ) => {
-            return await contract.getQuestionsCount()
+            return await contract.getQuestionsCount(this.pfp_contract.address, id, scene)
         })
     }
 
@@ -265,7 +266,7 @@ export class Blockchain {
     }
 
     async getAnswer(id:number, question:string) {
-        if (this.network == "mockup") return await this.mockupAnswer("This is an answer")
+        if (this.network == "mockup") return await this.mockupAnswer(`This is an answer to ${id} ${question}`)
         const scene = "default"
         return this.getFactory(
             this.brain_contract
@@ -275,26 +276,32 @@ export class Blockchain {
     }
 
     async getQuestions(id:number, offset:number) {
-        if (this.network == "mockup") return await this.mockupAnswer(
-            [
-                "Hi!",
-                "Who are you?",
-                "What are you?",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                ""
-            ]
-        )
+        if (this.network == "mockup") return await this.mockupAnswer(this.getMockupQuestions(id, offset))
         const scene = "default"
         return this.getFactory(
             this.brain_contract
         ).then(async ( contract: any ) => {
             return await contract.getQuestions(this.pfp_contract.address, id, scene, offset)
         })
+    }
+
+    getMockupQuestions(id:number, offset:number) {
+        const q = []
+        let c = 10
+        if (offset < 10) {
+            c = 10
+        } else if (offset < 20) {
+            c = 3
+        } else {
+            c = 0
+        }
+        for (let n=0; n<10; n++) {
+            q.push("")
+        }
+        for (let n=0; n<c; n++) {
+            q[n] = `Q ${n} (${id}, ${offset})`
+        }
+        return q
     }
 
     /*

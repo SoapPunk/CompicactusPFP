@@ -13,7 +13,7 @@ executeTask(async () => {
   }
 })
 
-const st2 = new Stool(0)
+const st2 = new Stool(1)
 st2.addComponent(new Transform({
     position: new Vector3(8, 2.5, -0.3)
 }))
