@@ -239,7 +239,7 @@ export class Blockchain {
     }
 
     async getQuestionsCount(id:number) {
-        if (this.network == "mockup") return await this.mockupAnswer(20)
+        if (this.network == "mockup") return await this.mockupAnswer(30)
         const scene = "default"
         return this.getFactory(
             this.brain_contract
@@ -287,10 +287,10 @@ export class Blockchain {
 
     getMockupQuestions(id:number, offset:number) {
         const q = []
-        let c = 10
-        if (offset < 10) {
+        let c
+        if (offset < 20) {
             c = 10
-        } else if (offset < 20) {
+        } else if (offset < 30) {
             c = 3
         } else {
             c = 0

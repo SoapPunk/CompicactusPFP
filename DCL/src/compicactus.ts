@@ -171,7 +171,7 @@ export class Compicactus extends Entity {
         //}))
         // this.setParent(this)
 
-        this.set_mp4_body(this.current_compi)
+        //this.set_mp4_body(this.current_compi)
     }
 
     play_random() {

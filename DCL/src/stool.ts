@@ -6,8 +6,8 @@ import * as eth from "eth-connect"
 
 import planesMenu from "./planesMenuB"
 
-const current_chain = "mumbai"
-//const current_chain = "mockup"
+//const current_chain = "mumbai"
+const current_chain = "mockup"
 const blockchain = new Blockchain(current_chain)
 
 
@@ -16,9 +16,9 @@ const panelsAlbedoTexture = new Texture("textures/CompiUIB.png")
 const myMaterial = new Material()
 myMaterial.transparencyMode = 1
 myMaterial.albedoTexture = panelsAlbedoTexture
-//myMaterial.emissiveTexture = panelsEmissiveTexture
-//myMaterial.emissiveIntensity = 1
-//myMaterial.emissiveColor = new Color3(0.5, 0.5, 0.5)
+myMaterial.emissiveTexture = panelsAlbedoTexture
+myMaterial.emissiveIntensity = 1
+myMaterial.emissiveColor = new Color3(0.5, 0.5, 0.5)
 
 const canvas = new UICanvas()
 
@@ -193,7 +193,7 @@ export class Stool extends Entity {
 
         // Compi Data (id: name)
         this.compidata_shape.fontSize = 1
-        this.compidata_shape.value = "-"
+        this.compidata_shape.value = ""
         this.compidata_shape.hTextAlign = "left"
         this.compidata_shape.vTextAlign = "center"
         this.compidata_shape.font = new Font(Fonts.SanFrancisco_Heavy)
@@ -214,7 +214,7 @@ export class Stool extends Entity {
         this.questions_shape.vTextAlign = "top"
         this.questions_shape.fontSize = 1
         this.questions_shape.fontWeight = 'normal'
-        this.questions_shape.value = "Question 1"
+        this.questions_shape.value = ""
         this.questions_shape.width = 1.5
         this.questions_shape.color = Color3.Black()
         this.questions_entity = new Entity()
@@ -307,6 +307,15 @@ export class StoolSystem implements ISystem {
             }
 
             if (this.working) continue
+            if (stool_component.current_compi == -1) {
+                this.working = true
+                stool_component.current_action = ""
+                stool_component.goto_compi = 0
+                this.goto(stool_component)
+                continue
+            } else if (stool_component.current_compi == -2) {
+                continue
+            }
             if (stool_component.dirty_compi) {
                 this.working = true
                 this.updateCompi(stool)
@@ -403,26 +412,20 @@ export class StoolSystem implements ISystem {
             if (compisCount>0) {
                 if (stool_component.goto_compi<0) {
                     stool_component.current_compi = compisCount-1
-                    //stool_component.goto_compi = compisCount-1
                     stool_component.dirty_compi = true
                 } else if (stool_component.goto_compi>=compisCount) {
                     stool_component.current_compi = 0
-                    //stool_component.goto_compi = 0
                     stool_component.dirty_compi = true
                 }
                 stool_component.current_compi = stool_component.goto_compi
                 stool_component.dirty_compi = true
             } else {
-                stool_component.goto_compi = -1
-                stool_component.current_compi = -1
-                stool_component.dirty_compi = true
+                stool_component.current_compi = -2
             }
         } else {
             stool_component.current_compi = stool_component.goto_compi
             stool_component.dirty_compi = true
         }
-
-        log(stool_component.goto_compi, stool_component.current_compi)
 
         this.working = false
     }
@@ -462,7 +465,7 @@ export class StoolSystem implements ISystem {
 
         if (stool_component.goto_qpage < 0) {
             stool_component.current_qpage = 0
-        } else if (stool_component.goto_qpage > 0 && questions_count < 10) {
+        } else if (stool_component.goto_qpage > stool_component.current_qpage && questions_count < 10) {
             stool_component.current_qpage = 0
         } else {
             stool_component.current_qpage = stool_component.goto_qpage
@@ -579,6 +582,17 @@ export class StoolSystem implements ISystem {
             })
         })
 
+        entity.compi_entity.addComponent(
+            new OnPointerDown((e) => {
+                entity.textInput.visible = false
+                this.working = false
+                entity.compi_entity.removeComponent(OnPointerDown)
+            },
+            {
+                hoverText: "Cancel",
+            })
+        )
+
 
     }
 
@@ -610,7 +624,16 @@ export class StoolSystem implements ISystem {
             })
         })
 
-
+        entity.compi_entity.addComponent(
+            new OnPointerDown((e) => {
+                entity.textInput.visible = false
+                this.working = false
+                entity.compi_entity.removeComponent(OnPointerDown)
+            },
+            {
+                hoverText: "Cancel",
+            })
+        )
     }
 
     async editAnwser(entity: Stool) {
@@ -634,7 +657,16 @@ export class StoolSystem implements ISystem {
             })
         })
 
-
+        entity.compi_entity.addComponent(
+            new OnPointerDown((e) => {
+                entity.textInput.visible = false
+                this.working = false
+                entity.compi_entity.removeComponent(OnPointerDown)
+            },
+            {
+                hoverText: "Cancel",
+            })
+        )
     }
 }
 
