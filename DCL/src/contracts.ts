@@ -259,8 +259,20 @@ export class Blockchain {
     async addQuestion(id:number, question:string, answer:string) {
         if (this.network == "mockup") return await this.mockupAnswer(0)
         const scene = "default"
-        const functionSsetQuestion = new eth.SolidityFunction(this.getFunction("addQuestion", abiBrain));
-        const functionSignature = functionSsetQuestion.toPayload([this.pfp_contract.address, id, scene, question, answer]);
+        const functionAddQuestion = new eth.SolidityFunction(this.getFunction("addQuestion", abiBrain));
+        const functionSignature = functionAddQuestion.toPayload([this.pfp_contract.address, id, scene, question, answer]);
+        log(functionSignature)
+        return this.prepareMetaTransaction(functionSignature, this.brain_contract).then().catch()
+    }
+
+    async removeQuestion(id:number, question:string, questionId:number) {
+        if (this.network == "mockup"){
+            log("removeQuestion", question, questionId)
+            return await this.mockupAnswer(0)
+        }
+        const scene = "default"
+        const functionRemoveQuestion = new eth.SolidityFunction(this.getFunction("removeQuestion", abiBrain));
+        const functionSignature = functionRemoveQuestion.toPayload([this.pfp_contract.address, id, scene, question, questionId]);
         log(functionSignature)
         return this.prepareMetaTransaction(functionSignature, this.brain_contract).then().catch()
     }
@@ -330,7 +342,11 @@ export class Blockchain {
     }*/
 
     async mockupAnswer(answer: any) {
-        sleep(500 + (500*Math.random()))
+        let time = 500 + (500*Math.random())
+        if (answer == 0) {
+            time = 100
+        }
+        sleep(time)
         return answer
     }
 

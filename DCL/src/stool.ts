@@ -6,8 +6,8 @@ import * as eth from "eth-connect"
 
 import planesMenu from "./planesMenuB"
 
-//const current_chain = "mumbai"
-const current_chain = "mockup"
+const current_chain = "mumbai"
+//const current_chain = "mockup"
 const blockchain = new Blockchain(current_chain)
 
 
@@ -75,6 +75,14 @@ export class Stool extends Entity {
     arrowleftquestions_entity: Entity
     arrowrightquestions_entity: Entity
 
+    remove_entity: Entity = new Entity()
+    editanswer_entity: Entity = new Entity()
+
+    cancel_entity: Entity = new Entity()
+    error_entity: Entity = new Entity()
+    ok_entity: Entity = new Entity()
+    working_entity: Entity = new Entity()
+
     stool_component: StoolComponent
 
     textInput:UIInputText
@@ -124,13 +132,24 @@ export class Stool extends Entity {
                     hoverText: "Add question",
                 })
             )
-            const editanswer_entity = this.createPlane(planesMenu.EditAnswer)
-            editanswer_entity.addComponent(
+            this.editanswer_entity = this.createPlane(planesMenu.EditAnswer)
+            this.editanswer_entity.getComponent(PlaneShape).visible = false
+            this.editanswer_entity.addComponent(
                 new OnPointerDown(() => {
                     this.stool_component.current_action = "edit_answer"
                 },
                 {
                     hoverText: "Edit answer",
+                })
+            )
+            this.remove_entity = this.createPlane(planesMenu.Remove)
+            this.remove_entity.getComponent(PlaneShape).visible = false
+            this.remove_entity.addComponent(
+                new OnPointerDown(() => {
+                    this.stool_component.current_action = "remove_question"
+                },
+                {
+                    hoverText: "Remove Question",
                 })
             )
             const editname_entity = this.createPlane(planesMenu.EditName)
@@ -142,11 +161,48 @@ export class Stool extends Entity {
                     hoverText: "Set Name",
                 })
             )
-            const remove_entity = this.createPlane(planesMenu.Remove)
+            this.cancel_entity = this.createPlane(planesMenu.CancelRedCompi)
+            engine.removeEntity(this.cancel_entity)
+            this.cancel_entity.addComponent(
+                new OnPointerDown(() => {
+                    this.stool_component.current_action = "cancel"
+                },
+                {
+                    hoverText: "Cancel",
+                })
+            )
+            this.error_entity = this.createPlane(planesMenu.CancelRedCompi)
+            engine.removeEntity(this.error_entity)
+            this.error_entity.addComponent(
+                new OnPointerDown(() => {
+                    engine.removeEntity(this.error_entity)
+                },
+                {
+                    hoverText: "Error. Please try again!",
+                })
+            )
+            this.ok_entity = this.createPlane(planesMenu.OkGreenCompi)
+            engine.removeEntity(this.ok_entity)
+            this.ok_entity.addComponent(
+                new OnPointerDown(() => {
+                    engine.removeEntity(this.ok_entity)
+                },
+                {
+                    hoverText: "Success",
+                })
+            )
+            this.working_entity = this.createPlane(planesMenu.WorkingYellowCompi)
+            engine.removeEntity(this.working_entity)
+            this.working_entity.addComponent(
+                new OnPointerDown(() => {},
+                {
+                    hoverText: "Waiting for signature. Check wallet!",
+                })
+            )
         }
         this.arrowleftquestions_entity = this.createPlane(planesMenu.ArrowLeftQuestions)
         this.arrowleftquestions_entity.addComponent(
-            new OnPointerDown((e) => {
+            new OnPointerDown(() => {
                 this.stool_component.current_action = "previous_question_page"
             },
             {
@@ -155,7 +211,7 @@ export class Stool extends Entity {
         )
         this.arrowrightquestions_entity = this.createPlane(planesMenu.ArrowRightQuestions)
         this.arrowrightquestions_entity.addComponent(
-            new OnPointerDown((e) => {
+            new OnPointerDown(() => {
                 this.stool_component.current_action = "next_question_page"
             },
             {
@@ -220,7 +276,7 @@ export class Stool extends Entity {
         this.questions_entity = new Entity()
         this.questions_entity.addComponent(this.questions_shape)
         this.questions_entity.addComponent(new Transform({
-            position: new Vector3(1, 0.1, 0.08),
+            position: new Vector3(1.1, 0.1, 0.08),
             rotation: Quaternion.Euler(0, 180, 0),
             scale: new Vector3(0.5, 0.5, 1)
         }))
@@ -295,15 +351,24 @@ export class StoolSystem implements ISystem {
 
             if (stool_component.answer != stool.answer_shape.value) {
                 stool.answer_shape.value = stool_component.answer
-                stool.answer_shape.width = 1.5
+                stool.answer_shape.width = 1.2
             }
             if (stool_component.questions != stool.questions_shape.value) {
                 stool.questions_shape.value = stool_component.questions
-                stool.questions_shape.width = 1.5
+                stool.questions_shape.width = 1.2
             }
             if (stool_component.play_animation >= 0) {
                 stool.compi_entity.set_mp4_body(stool_component.current_token, stool_component.play_animation)
                 stool_component.play_animation = -1
+            }
+
+            if (stool_component.current_action == "cancel") {
+                stool_component.current_action = ""
+                stool.textInput.visible = false
+                //stool.cancel_entity.getComponent(PlaneShape).visible = false
+                engine.removeEntity(stool.cancel_entity)
+                this.working = false
+                continue
             }
 
             if (this.working) continue
@@ -352,6 +417,12 @@ export class StoolSystem implements ISystem {
                 this.addQuestion(entity as Stool)
                 continue
             }
+            if (stool_component.current_action == "remove_question") {
+                this.working = true
+                stool_component.current_action = ""
+                this.removeQuestion(entity as Stool)
+                continue
+            }
             if (stool_component.current_action == "edit_answer") {
                 this.working = true
                 stool_component.current_action = ""
@@ -367,7 +438,7 @@ export class StoolSystem implements ISystem {
             if (stool_component.current_action == "ask_question") {
                 this.working = true
                 stool_component.current_action = ""
-                this.askQuestion(stool_component)
+                this.askQuestion(entity as Stool)
                 continue
             }
             if (stool_component.current_action == "previous_question") {
@@ -530,7 +601,7 @@ export class StoolSystem implements ISystem {
 
         if (questionCount > 10) {
             const min = stool_component.current_qpage * 10
-            const max = (stool_component.current_qpage * 10) + 10
+            //const max = (stool_component.current_qpage * 10) + 10
             if (min == 0) {
                 entity.arrowleftquestions_entity.getComponent(PlaneShape).visible = false
             }
@@ -568,41 +639,40 @@ export class StoolSystem implements ISystem {
 
         entity.textInput.visible = true
         entity.textInput.placeholder = "Write name here"
+        engine.addEntity(entity.cancel_entity)
 
         entity.textInput.onTextSubmit = new OnTextSubmit(async (x) => {
             entity.textInput.visible = false
-
+            engine.removeEntity(entity.cancel_entity)
+            engine.addEntity(entity.working_entity)
             await blockchain.setName(stool_component.current_token, x.text).then(tx => {
                 stool_component.dirty_compi = true
                 this.working = false
+                engine.removeEntity(entity.working_entity)
+                engine.addEntity(entity.ok_entity)
                 log("setName Ok ", tx)
             }).catch(e => {
                 this.working = false
+                engine.removeEntity(entity.working_entity)
+                engine.addEntity(entity.error_entity)
                 log("Error on setName", e)
             })
         })
 
-        entity.compi_entity.addComponent(
-            new OnPointerDown((e) => {
-                entity.textInput.visible = false
-                this.working = false
-                entity.compi_entity.removeComponent(OnPointerDown)
-            },
-            {
-                hoverText: "Cancel",
-            })
-        )
-
-
+        //entity.cancel_entity.getComponent(PlaneShape).visible = true
+        engine.addEntity(entity.cancel_entity)
     }
 
-    async askQuestion(stool_component: StoolComponent) {
+    async askQuestion(entity: Stool) {
+        const stool_component = entity.getComponent(StoolComponent)
         const question_text = stool_component.question_list[stool_component.current_question].value
         const answer = await blockchain.getAnswer(stool_component.current_token, question_text)
         const answer_text = `You: ${question_text}\n\nCompi: ${answer}`
         stool_component.answer = answer_text
         const clip_id = Math.floor(Math.random()*11)
         stool_component.play_animation = clip_id
+        entity.editanswer_entity.getComponent(PlaneShape).visible = true
+        entity.remove_entity.getComponent(PlaneShape).visible = true
         this.working = false
     }
 
@@ -610,63 +680,74 @@ export class StoolSystem implements ISystem {
         const stool_component = entity.getComponent(StoolComponent)
         entity.textInput.visible = true
         entity.textInput.placeholder = "Write question"
+        engine.addEntity(entity.cancel_entity)
 
         entity.textInput.onTextSubmit = new OnTextSubmit(async (x) => {
             entity.textInput.visible = false
-
+            engine.removeEntity(entity.cancel_entity)
+            engine.addEntity(entity.working_entity)
             await blockchain.addQuestion(stool_component.current_token, x.text, "Default answer").then(tx => {
                 stool_component.dirty_compi = true
                 this.working = false
+                engine.removeEntity(entity.working_entity)
+                engine.addEntity(entity.ok_entity)
                 log("addQuestion Ok ", tx)
             }).catch(e => {
                 this.working = false
+                engine.removeEntity(entity.working_entity)
+                engine.addEntity(entity.error_entity)
                 log("Error on addQuestion", e)
             })
         })
+        //entity.cancel_entity.getComponent(PlaneShape).visible = true
+        engine.addEntity(entity.cancel_entity)
+    }
 
-        entity.compi_entity.addComponent(
-            new OnPointerDown((e) => {
-                entity.textInput.visible = false
-                this.working = false
-                entity.compi_entity.removeComponent(OnPointerDown)
-            },
-            {
-                hoverText: "Cancel",
-            })
-        )
+    async removeQuestion(entity: Stool) {
+        const stool_component = entity.getComponent(StoolComponent)
+        const questionText = stool_component.question_list[stool_component.current_question].value
+        const questionId = stool_component.question_list[stool_component.current_question].id
+        engine.addEntity(entity.working_entity)
+        await blockchain.removeQuestion(stool_component.current_token, questionText, questionId).then(tx => {
+            stool_component.dirty_compi = true
+            this.working = false
+            engine.removeEntity(entity.working_entity)
+            engine.addEntity(entity.ok_entity)
+            log("removeQuestion Ok ", tx)
+        }).catch(e => {
+            this.working = false
+            engine.removeEntity(entity.working_entity)
+            engine.addEntity(entity.error_entity)
+            log("Error on removeQuestion", e)
+        })
     }
 
     async editAnwser(entity: Stool) {
         const stool_component = entity.getComponent(StoolComponent)
         log("Edit Anwser")
+        engine.addEntity(entity.cancel_entity)
 
         entity.textInput.visible = true
         entity.textInput.placeholder = "Write answer here"
         entity.textInput.onTextSubmit = new OnTextSubmit(async (x) => {
             entity.textInput.visible = false
-
             log("this.current_token", stool_component.current_token)
             const question = stool_component.question_list[stool_component.current_question].value
+            engine.removeEntity(entity.cancel_entity)
+            engine.addEntity(entity.working_entity)
             await blockchain.addQuestion(stool_component.current_token, question, x.text).then(tx => {
                 stool_component.dirty_compi = true
                 this.working = false
+                engine.removeEntity(entity.working_entity)
+                engine.addEntity(entity.ok_entity)
                 log("addQuestion (Edit Anwser) Ok ", tx)
             }).catch(e => {
                 this.working = false
+                engine.removeEntity(entity.working_entity)
+                engine.addEntity(entity.error_entity)
                 log("Error on addQuestion (Edit Anwser)", e)
             })
         })
-
-        entity.compi_entity.addComponent(
-            new OnPointerDown((e) => {
-                entity.textInput.visible = false
-                this.working = false
-                entity.compi_entity.removeComponent(OnPointerDown)
-            },
-            {
-                hoverText: "Cancel",
-            })
-        )
     }
 }
 
