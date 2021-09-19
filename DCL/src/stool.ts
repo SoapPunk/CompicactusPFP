@@ -6,8 +6,8 @@ import * as eth from "eth-connect"
 
 import planesMenu from "./planesMenuB"
 
-const current_chain = "mumbai"
-//const current_chain = "mockup"
+//const current_chain = "mumbai"
+const current_chain = "mockup"
 const blockchain = new Blockchain(current_chain)
 
 
@@ -22,6 +22,7 @@ myMaterial.emissiveColor = new Color3(0.5, 0.5, 0.5)
 
 const canvas = new UICanvas()
 
+const y_offset = 0.55
 
 @Component("stool")
 export class StoolComponent {
@@ -222,7 +223,7 @@ export class Stool extends Entity {
         const backgroundcompicactus_entity = this.createPlane(planesMenu.BackgroundCompicactus)
         const backgroundquestions_entity = this.createPlane(planesMenu.BackgroundQuestions)
         const compiplaceholder_entity = this.createPlane(planesMenu.Compicactus)
-        const selectedquestions_entity = this.createPlane(planesMenu.SelectedQuestion)
+        //const selectedquestions_entity = this.createPlane(planesMenu.SelectedQuestion)
         const name_entity = this.createPlane(planesMenu.Name)
 
         // Compicactus
@@ -257,7 +258,7 @@ export class Stool extends Entity {
         this.compidata_entity = new Entity()
         this.compidata_entity.addComponent(this.compidata_shape)
         this.compidata_entity.addComponent(new Transform({
-            position: new Vector3(0.3, -0.78, 0.08),
+            position: new Vector3(0.3, -0.78+y_offset+1.47, 0.08),
             rotation: Quaternion.Euler(0, 180, 0),
             scale: new Vector3(0.4, 0.4, 0.4)
         }))
@@ -276,7 +277,7 @@ export class Stool extends Entity {
         this.questions_entity = new Entity()
         this.questions_entity.addComponent(this.questions_shape)
         this.questions_entity.addComponent(new Transform({
-            position: new Vector3(1.1, 0.1, 0.08),
+            position: new Vector3(1.1, 0.1+y_offset, 0.08),
             rotation: Quaternion.Euler(0, 180, 0),
             scale: new Vector3(0.5, 0.5, 1)
         }))
@@ -296,7 +297,7 @@ export class Stool extends Entity {
         this.answer_entity = new Entity()
         this.answer_entity.addComponent(this.answer_shape)
         this.answer_entity.addComponent(new Transform({
-            position: new Vector3(-1, 0.1, 0.08),
+            position: new Vector3(-1, 0.1+y_offset, 0.08),
             rotation: Quaternion.Euler(0, 180, 0),
             scale: new Vector3(0.5, 0.5, 1)
         }))
@@ -320,11 +321,13 @@ export class Stool extends Entity {
         const plane = new PlaneShape()
         plane.uvs = data.uv
         e.addComponent(plane)
-        e.addComponent(new Transform({
+        const t = new Transform({
             position: new Vector3(...data.position),
             rotation: new Quaternion(...data.rotation),
             scale: new Vector3(...data.scale)
-        }))
+        })
+        t.position.y += y_offset
+        e.addComponent(t)
 
         e.addComponent(myMaterial)
         e.setParent(this)
@@ -358,7 +361,8 @@ export class StoolSystem implements ISystem {
                 stool.questions_shape.width = 1.2
             }
             if (stool_component.play_animation >= 0) {
-                stool.compi_entity.set_mp4_body(stool_component.current_token, stool_component.play_animation)
+                //stool.compi_entity.set_mp4_body(stool_component.current_token, stool_component.play_animation)
+                stool.compi_entity.play_random()
                 stool_component.play_animation = -1
             }
 
@@ -572,6 +576,9 @@ export class StoolSystem implements ISystem {
 
         let compiId: number = 0
         if(!stool_component.forced) {
+            entity.editanswer_entity.getComponent(PlaneShape).visible = false
+            entity.remove_entity.getComponent(PlaneShape).visible = false
+
             compiId = await blockchain.tokenOfOwnerByIndex(stool_component.current_compi)
 
             stool_component.current_token = compiId
@@ -581,9 +588,9 @@ export class StoolSystem implements ISystem {
         log("compiId", compiId)
         const compiName = await blockchain.getName(compiId)
 
-        entity.compidata_shape.value = compiId + ":" + compiName
+        entity.compidata_shape.value = `#${compiId}:${compiName}`
 
-        entity.compi_entity.set_mp4_body(compiId)
+        entity.compi_entity.set_mp4_body(compiId, 0, true)
 
         // Get questions
 
@@ -671,8 +678,10 @@ export class StoolSystem implements ISystem {
         stool_component.answer = answer_text
         const clip_id = Math.floor(Math.random()*11)
         stool_component.play_animation = clip_id
-        entity.editanswer_entity.getComponent(PlaneShape).visible = true
-        entity.remove_entity.getComponent(PlaneShape).visible = true
+        if (!stool_component.forced) {
+            entity.editanswer_entity.getComponent(PlaneShape).visible = true
+            entity.remove_entity.getComponent(PlaneShape).visible = true
+        }
         this.working = false
     }
 

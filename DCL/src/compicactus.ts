@@ -149,6 +149,8 @@ export class Compicactus extends Entity {
 
     current_compi: number = 0
 
+    plane_material: BasicMaterial
+
     constructor(){
         super()
 
@@ -163,15 +165,11 @@ export class Compicactus extends Entity {
             "pot": ""
         }
 
-        // this.plane_entity = new Entity()
-        this.addComponent(new PlaneShape())
-        //this.addComponent(new Transform({
-        //    position: new Vector3(0, 0.5, 0),
-        //    scale: new Vector3(1, 1, 1)
-        //}))
-        // this.setParent(this)
+        this.plane_material = new BasicMaterial()
 
-        //this.set_mp4_body(this.current_compi)
+        this.addComponent(new PlaneShape())
+        this.addComponent(this.plane_material)
+
     }
 
     play_random() {
@@ -183,7 +181,7 @@ export class Compicactus extends Entity {
             clip.looping = false
         }*/
         const clip_id = Math.floor(Math.random()*compi_actions.length)
-        this.set_mp4_body(this.current_compi, clip_id)
+        this.set_mp4_body(this.current_compi, clip_id, false)
     }
 
     remove_elements() {
@@ -192,18 +190,22 @@ export class Compicactus extends Entity {
         }
     }
 
-    async set_mp4_body(id: number, animation: number = 0) {
+    async set_mp4_body(id: number, animation: number, reset_material: boolean) {
         log("set mp4 body")
+        this.current_compi = id
+        
+        if (reset_material) {
+            this.plane_material = new BasicMaterial()
+            this.addComponentOrReplace(this.plane_material)
+        }
 
         const action = compi_actions[animation]
         const myVideoClip = new VideoClip(
           `https://ipfs.io/ipfs/QmTVYczLEQhkPSBZx5ZVdkaU5xGNxpV4nTVciUQhCq17Em/${id}/${id}_${action}.mp4`
         )
         const myVideoTexture = new VideoTexture(myVideoClip)
+        this.plane_material.texture = myVideoTexture
 
-        const myMaterial = new BasicMaterial()
-        myMaterial.texture = myVideoTexture
-        this.addComponentOrReplace(myMaterial)
         myVideoTexture.playing = true
     }
 

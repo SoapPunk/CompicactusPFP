@@ -8,16 +8,27 @@ executeTask(async () => {
   if (publicKey) {
       const st = new Stool()
       st.addComponent(new Transform({
-          position: new Vector3(8, 1.5, 8)
+          position: new Vector3(8, 0, 8)
       }))
+      st.addComponent(new Billboard(false, true, false))
   }
 })
 
 const st2 = new Stool(1)
 st2.addComponent(new Transform({
-    position: new Vector3(8, 2.5, -0.3)
+    position: new Vector3(8, 1.5, -0.3)
 }))
-st2.addComponent(new Billboard())
+st2.addComponent(new Billboard(false, true, false))
+
+
+const st3 = new Stool(2)
+st3.addComponent(new Transform({
+    position: new Vector3(8, 0, -8)
+}))
+st3.addComponent(new Billboard(false, true, false))
+
+
+
 
 const building = new Entity()
 building.addComponent(new GLTFShape("models/Building.gltf"))
