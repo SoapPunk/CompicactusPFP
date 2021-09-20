@@ -170,6 +170,13 @@ contract CompicactusPFP is
     uint256[48] private __gap;
 
 
+
+
+
+
+
+
+
     /* Addons */
 
     /**
@@ -188,7 +195,31 @@ contract CompicactusPFP is
 
         _contractURI = __contractURI;
 
-        emit ContractURISet(__contractURI);
+        emit ContractURISet(_contractURI);
+    }
+
+    /**
+    * @dev Set the URL to a JSON file with token metadata
+    * @param baseTokenURI - an URL to the metadata
+    */
+    function setBaseTokenURI(string memory baseTokenURI) public {
+        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "CompicactusPFP: must have admin role to change base token uri");
+
+        _baseTokenURI = baseTokenURI;
+
+        emit BaseTokenURISet(baseTokenURI);
+    }
+
+
+    // This is to support Native meta transactions
+    // never use msg.sender directly, use _msgSender() instead
+    function _msgSender()
+        internal
+        override
+        view
+        returns (address sender) // Eibriel removed "payable"
+    {
+            return ContextMixin.msgSender();
     }
 
 
@@ -196,7 +227,13 @@ contract CompicactusPFP is
 
     /**
     * @dev Emits when the contract URI is set
-    * @param contractURI - an URL to the metadata
+    * @param _contractURI - an URL to the metadata
     */
-    event ContractURISet(string contractURI);
+    event ContractURISet(string _contractURI);
+
+    /**
+    * @dev Emits when the base token URI is set
+    * @param baseTokenURI - an URL to the metadata
+    */
+    event BaseTokenURISet(string baseTokenURI);
 }

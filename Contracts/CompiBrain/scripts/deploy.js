@@ -29,6 +29,14 @@ async function main() {
   const trueAdmin = '0xCF10CD8B5Dc2323B1eb6de6164647756BAd4dE4d';
   const fakeAdmin = accounts[0].address;
 
+  console.log("Transferring ownership of ProxyAdmin...");
+  // The owner of the ProxyAdmin can upgrade our contracts
+  await upgrades.admin.transferProxyAdminOwnership(trueAdmin);
+  console.log("Transferred ownership of ProxyAdmin to:", trueAdmin);
+
+  console.log("Sleeping");
+  sleep(2000);
+
   console.log("Granting admin role");
   const grantRoleTx = await compibrain.grantRole(ADMIN_ROLE, trueAdmin);
   await grantRoleTx.wait();
@@ -41,14 +49,6 @@ async function main() {
   const revokeRoleTx = await compibrain.revokeRole(ADMIN_ROLE, fakeAdmin);
   await revokeRoleTx.wait();
   console.log("Done");
-
-  console.log("Sleeping");
-  sleep(2000);
-
-  console.log("Transferring ownership of ProxyAdmin...");
-  // The owner of the ProxyAdmin can upgrade our contracts
-  await upgrades.admin.transferProxyAdminOwnership(trueAdmin);
-  console.log("Transferred ownership of ProxyAdmin to:", trueAdmin);
 
 }
 

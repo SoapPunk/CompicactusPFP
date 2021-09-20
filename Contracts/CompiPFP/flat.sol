@@ -1,6 +1,6 @@
-// Sources flattened with hardhat v2.6.1 https://hardhat.org
+// Sources flattened with hardhat v2.6.4 https://hardhat.org
 
-// File @openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol@v4.3.2
 
 // SPDX-License-Identifier: MIT
 
@@ -28,7 +28,7 @@ interface IERC165Upgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol@v4.3.2
 
 
 
@@ -172,7 +172,7 @@ interface IERC721Upgradeable is IERC165Upgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol@v4.3.2
 
 
 
@@ -202,7 +202,7 @@ interface IERC721ReceiverUpgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721MetadataUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721MetadataUpgradeable.sol@v4.3.2
 
 
 
@@ -230,7 +230,7 @@ interface IERC721MetadataUpgradeable is IERC721Upgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol@v4.3.2
 
 
 
@@ -423,7 +423,7 @@ library AddressUpgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol@v4.3.2
 
 
 
@@ -473,7 +473,7 @@ abstract contract Initializable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol@v4.3.2
 
 
 
@@ -507,7 +507,7 @@ abstract contract ContextUpgradeable is Initializable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol@v4.3.2
 
 
 
@@ -577,7 +577,7 @@ library StringsUpgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol@v4.3.2
 
 
 
@@ -615,7 +615,7 @@ abstract contract ERC165Upgradeable is Initializable, IERC165Upgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol@v4.3.2
 
 
 
@@ -1036,7 +1036,7 @@ contract ERC721Upgradeable is Initializable, ContextUpgradeable, ERC165Upgradeab
 }
 
 
-// File @openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721EnumerableUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721EnumerableUpgradeable.sol@v4.3.2
 
 
 
@@ -1066,7 +1066,7 @@ interface IERC721EnumerableUpgradeable is IERC721Upgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol@v4.3.2
 
 
 
@@ -1240,7 +1240,7 @@ abstract contract ERC721EnumerableUpgradeable is Initializable, ERC721Upgradeabl
 }
 
 
-// File @openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol@v4.3.2
 
 
 
@@ -1277,7 +1277,7 @@ abstract contract ERC721BurnableUpgradeable is Initializable, ContextUpgradeable
 }
 
 
-// File @openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol@v4.3.2
 
 
 
@@ -1376,7 +1376,7 @@ abstract contract PausableUpgradeable is Initializable, ContextUpgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721PausableUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721PausableUpgradeable.sol@v4.3.2
 
 
 
@@ -1421,7 +1421,7 @@ abstract contract ERC721PausableUpgradeable is Initializable, ERC721Upgradeable,
 }
 
 
-// File @openzeppelin/contracts-upgradeable/access/IAccessControlUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/access/IAccessControlUpgradeable.sol@v4.3.2
 
 
 
@@ -1512,7 +1512,7 @@ interface IAccessControlUpgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/access/IAccessControlEnumerableUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/access/IAccessControlEnumerableUpgradeable.sol@v4.3.2
 
 
 
@@ -1544,7 +1544,7 @@ interface IAccessControlEnumerableUpgradeable is IAccessControlUpgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol@v4.3.2
 
 
 
@@ -1766,7 +1766,7 @@ abstract contract AccessControlUpgradeable is Initializable, ContextUpgradeable,
 }
 
 
-// File @openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol@v4.3.2
 
 
 
@@ -2126,7 +2126,7 @@ library EnumerableSetUpgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgradeable.sol@v4.3.2
 
 
 
@@ -2218,7 +2218,7 @@ abstract contract AccessControlEnumerableUpgradeable is Initializable, IAccessCo
 }
 
 
-// File @openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol@v4.3.2
 
 
 
@@ -2264,7 +2264,7 @@ library CountersUpgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol@v4.3.2
 
 
 
@@ -2878,6 +2878,13 @@ contract CompicactusPFP is
     uint256[48] private __gap;
 
 
+
+
+
+
+
+
+
     /* Addons */
 
     /**
@@ -2896,7 +2903,31 @@ contract CompicactusPFP is
 
         _contractURI = __contractURI;
 
-        emit ContractURISet(__contractURI);
+        emit ContractURISet(_contractURI);
+    }
+
+    /**
+    * @dev Set the URL to a JSON file with token metadata
+    * @param baseTokenURI - an URL to the metadata
+    */
+    function setBaseTokenURI(string memory baseTokenURI) public {
+        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "CompicactusPFP: must have admin role to change base token uri");
+
+        _baseTokenURI = baseTokenURI;
+
+        emit BaseTokenURISet(baseTokenURI);
+    }
+
+
+    // This is to support Native meta transactions
+    // never use msg.sender directly, use _msgSender() instead
+    function _msgSender()
+        internal
+        override
+        view
+        returns (address sender) // Eibriel removed "payable"
+    {
+            return ContextMixin.msgSender();
     }
 
 
@@ -2904,7 +2935,13 @@ contract CompicactusPFP is
 
     /**
     * @dev Emits when the contract URI is set
-    * @param contractURI - an URL to the metadata
+    * @param _contractURI - an URL to the metadata
     */
-    event ContractURISet(string contractURI);
+    event ContractURISet(string _contractURI);
+
+    /**
+    * @dev Emits when the base token URI is set
+    * @param baseTokenURI - an URL to the metadata
+    */
+    event BaseTokenURISet(string baseTokenURI);
 }

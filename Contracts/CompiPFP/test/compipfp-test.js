@@ -33,6 +33,16 @@ describe("Greeter", function () {
         await setMint2Tx.wait();
     });
 
+    it("Should return the baseTokenURI", async function () {
+
+        const setBaseTokenURITx = await compicactusPFP.setBaseTokenURI("ipfs://baseUri2/");
+
+        await setBaseTokenURITx.wait();
+
+        expect(await compicactusPFP.tokenURI(0)).to.equal("ipfs://baseUri2/0");
+
+    });
+
     it("Prevents mint for non minters", async function () {
 
         const setMintTx = compicactusPFP.connect(accounts[1]).mint(accounts[1].address);

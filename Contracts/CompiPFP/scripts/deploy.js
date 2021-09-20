@@ -17,6 +17,25 @@ async function main() {
     const trueAdmin = '0xCF10CD8B5Dc2323B1eb6de6164647756BAd4dE4d';
     const fakeAdmin = accounts[0].address;
 
+    const grantAdminRoleTx = await compiPFP.grantRole(ADMIN_ROLE, trueAdmin);
+    await grantAdminRoleTx.wait();
+
+    console.log("Sleeping");
+    sleep(2000);
+
+    const revokeAdminRoleTx = await compiPFP.revokeRole(ADMIN_ROLE, fakeAdmin);
+    await revokeAdminRoleTx.wait();
+
+    console.log("Sleeping");
+    sleep(2000);
+
+    console.log("Transferring ownership of ProxyAdmin...");
+    await upgrades.admin.transferProxyAdminOwnership(trueAdmin);
+    console.log("Transferred ownership of ProxyAdmin to:", trueAdmin);
+
+    console.log("Sleeping");
+    sleep(2000);
+
     const grantMinterRoleTx = await compiPFP.grantRole(MINTER_ROLE, trueAdmin);
     await grantMinterRoleTx.wait();
 
@@ -37,25 +56,6 @@ async function main() {
 
     const revokePauserRoleTx = await compiPFP.revokeRole(PAUSER_ROLE, fakeAdmin);
     await revokePauserRoleTx.wait();
-
-    console.log("Sleeping");
-    sleep(2000);
-
-    const grantAdminRoleTx = await compiPFP.grantRole(ADMIN_ROLE, trueAdmin);
-    await grantAdminRoleTx.wait();
-
-    console.log("Sleeping");
-    sleep(2000);
-
-    const revokeAdminRoleTx = await compiPFP.revokeRole(ADMIN_ROLE, fakeAdmin);
-    await revokeAdminRoleTx.wait();
-
-    console.log("Sleeping");
-    sleep(2000);
-
-    console.log("Transferring ownership of ProxyAdmin...");
-    await upgrades.admin.transferProxyAdminOwnership(trueAdmin);
-    console.log("Transferred ownership of ProxyAdmin to:", trueAdmin);
 }
 
 function sleep(milliseconds) {
