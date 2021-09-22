@@ -1,6 +1,6 @@
 import { getUserPublicKey } from "@decentraland/Identity"
 
-import { Stool, StoolSystem } from "./stool"
+import { Stool, StoolSystem } from "./compicactus/stool"
 
 executeTask(async () => {
   const publicKey = await getUserPublicKey()
@@ -30,12 +30,12 @@ st3.addComponent(new Billboard(false, true, false))
 
 
 
-const building = new Entity()
+/*const building = new Entity()
 building.addComponent(new GLTFShape("models/Building.gltf"))
 building.addComponent(new Transform({
     position: new Vector3(8, 0, -8),
     rotation: Quaternion.Euler(0, 90, 0)
 }))
-engine.addEntity(building)
+engine.addEntity(building)*/
 
 engine.addSystem(new StoolSystem())
