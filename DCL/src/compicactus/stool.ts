@@ -6,12 +6,13 @@ import * as eth from "eth-connect"
 
 import planesMenu from "./planesMenuB"
 
+const current_chain = "matic"
 //const current_chain = "mumbai"
-const current_chain = "mockup"
+//const current_chain = "mockup"
 const blockchain = new Blockchain(current_chain)
 
 
-const panelsAlbedoTexture = new Texture("textures/CompiUIB.png")
+const panelsAlbedoTexture = new Texture("https://ipfs.io/ipfs/bafybeifaih2h275bmmessdnwk5tkbbdsc6y4aacpbiu4jdsu2numusrxne/CompiUIB.png")
 //const panelsEmissiveTexture = new Texture("textures/CompiUIEmission.jpg")
 const myMaterial = new Material()
 myMaterial.transparencyMode = 1
@@ -112,7 +113,7 @@ export class Stool extends Entity {
                     this.stool_component.current_action = "previous_compi"
                 },
                 {
-                    hoverText: "Next Compi"
+                    hoverText: "Previous Compi"
                 })
             )
             const arrowrightcompi_entity = this.createPlane(planesMenu.ArrowRightCompi)
@@ -696,7 +697,7 @@ export class StoolSystem implements ISystem {
             engine.removeEntity(entity.cancel_entity)
             engine.addEntity(entity.working_entity)
             await blockchain.addQuestion(stool_component.current_token, x.text, "Default answer").then(tx => {
-                stool_component.dirty_compi = true
+                //stool_component.dirty_compi = true
                 this.working = false
                 engine.removeEntity(entity.working_entity)
                 engine.addEntity(entity.ok_entity)
@@ -718,7 +719,7 @@ export class StoolSystem implements ISystem {
         const questionId = stool_component.question_list[stool_component.current_question].id
         engine.addEntity(entity.working_entity)
         await blockchain.removeQuestion(stool_component.current_token, questionText, questionId).then(tx => {
-            stool_component.dirty_compi = true
+            //stool_component.dirty_compi = true
             this.working = false
             engine.removeEntity(entity.working_entity)
             engine.addEntity(entity.ok_entity)
@@ -745,7 +746,7 @@ export class StoolSystem implements ISystem {
             engine.removeEntity(entity.cancel_entity)
             engine.addEntity(entity.working_entity)
             await blockchain.addQuestion(stool_component.current_token, question, x.text).then(tx => {
-                stool_component.dirty_compi = true
+                //stool_component.dirty_compi = true
                 this.working = false
                 engine.removeEntity(entity.working_entity)
                 engine.addEntity(entity.ok_entity)

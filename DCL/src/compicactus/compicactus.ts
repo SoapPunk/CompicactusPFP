@@ -11,9 +11,9 @@ const elements = [
     "eyes"
 ]
 const compi_actions = [
-    "Action-01-Look R-L",
-    "Action-02-Look R",
-    "Action-03-Look L",
+    "Action-01-Look_R-L",
+    "Action-02-Look_R",
+    "Action-03-Look_L",
     "Action-04-Look-Up",
     "Action-05-Sleep",
     "Action-06-Dancing",
@@ -193,7 +193,7 @@ export class Compicactus extends Entity {
     async set_mp4_body(id: number, animation: number, reset_material: boolean) {
         log("set mp4 body")
         this.current_compi = id
-        
+
         if (reset_material) {
             this.plane_material = new BasicMaterial()
             this.addComponentOrReplace(this.plane_material)
@@ -201,7 +201,7 @@ export class Compicactus extends Entity {
 
         const action = compi_actions[animation]
         const myVideoClip = new VideoClip(
-          `https://ipfs.io/ipfs/QmTVYczLEQhkPSBZx5ZVdkaU5xGNxpV4nTVciUQhCq17Em/${id}/${id}_${action}.mp4`
+          `https://ipfs.io/ipfs/bafybeigqhvlyh464kginnllyxzqtisudfwnxegujxhs6dw3fwpfvfsiihe/mp4/${id}/${id}_${action}.mp4`
         )
         const myVideoTexture = new VideoTexture(myVideoClip)
         this.plane_material.texture = myVideoTexture

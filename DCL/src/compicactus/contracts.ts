@@ -10,7 +10,7 @@ import {
 import * as eth from "eth-connect";
 
 import abiMANA from './erc20Abi'
-import abiMinter from './minterAbi'
+import abiMinter from './minterAbi' 
 import abiPFP from './pfpAbi'
 import abiBrain from './brainAbi'
 
@@ -36,7 +36,7 @@ export const contracts = {
         matic: {
             version: '1',
             abi: abiMinter,
-            address: '',
+            address: '0xd5140d7b09B5DFB0C17e9bAb6EC8a7875B19367C',
             name: 'CompiMinter',
             chainId: 137
         },
@@ -52,7 +52,7 @@ export const contracts = {
         matic: {
             version: '1',
             abi: abiPFP,
-            address: '',
+            address: '0xB1Eb9BE1Cf04a19448355893ca357f6F010b03B6',
             name: 'CompiPFP',
             chainId: 137
         },
@@ -68,7 +68,7 @@ export const contracts = {
         matic: {
             version: '1',
             abi: abiBrain,
-            address: '',
+            address: '0x64406Be782d00E497ae1CdDFaB1bE1AA2787F02C',
             name: 'CompiBrain',
             chainId: 137
         },
