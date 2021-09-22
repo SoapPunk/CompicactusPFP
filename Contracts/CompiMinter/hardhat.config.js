@@ -51,8 +51,8 @@ module.exports = {
             accounts: {
                 mnemonic: mnemonic,
             },
-            gasPrice: 9000000000,
-            gasMultiplier: 3,
+            gasPrice: 15000000000,
+            gasMultiplier: 4,
             //timeout: 100000
         }
     }
