@@ -9,9 +9,18 @@
       ],
       "eth-connect": [
         "node_modules/eth-connect/eth-connect.d.ts"
+      ],
+      "@compicactus/dcl-scene-utils": [
+        "node_modules/@compicactus/dcl-scene-utils/dist/index.d.ts",
+        "../../../../../../.nvm/versions/node/v10.16.0/lib/node_modules/@compicactus/dcl-scene-utils/dist/index.d.ts",
+        "../../decentraland-compi-utils/dist/index.d.ts"
       ]
-    }
+    },
+    "baseUrl": "."
   },
-  "include": ["src/**/*.ts"],
-  "extends": "./node_modules/decentraland-ecs/types/tsconfig.json"
+  "include": [
+    "src/**/*.ts"
+  ],
+  "extends": "./node_modules/decentraland-ecs/types/tsconfig.json",
+  "compileOnSave": false
 }

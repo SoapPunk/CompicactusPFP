@@ -14,11 +14,13 @@
     "decentraland-ecs": "^6.6.7"
   },
   "dependencies": {
+    "@compicactus/dcl-scene-utils": "^0.0.0-20210924164247.commit-4412d32",
     "decentraland-transactions": "^1.22.2",
     "eth-connect": "^6.0.2"
   },
   "bundleDependencies": [
     "decentraland-transactions",
-    "eth-connect"
+    "eth-connect",
+    "@compicactus/dcl-scene-utils"
   ]
 }
