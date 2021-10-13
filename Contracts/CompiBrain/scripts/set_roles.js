@@ -15,24 +15,16 @@ async function main() {
 
   // We get the contract to deploy
 
-  const CompiBrain = await ethers.getContractFactory("CompiBrain");
-  const compibrain = await upgrades.deployProxy(CompiBrain, ["CompiBrain"]);
-  await compibrain.deployed();
-  console.log("CompiBrain deployed to:", compibrain.address);
+  const CompiBrain = await ethers.getContractFactory("CompiBrain")
+  const compibrain = await CompiBrain.attach("0x89e2558091D28290B834ddd42e59E2b72D07Fe0B")
 
-  /*console.log("Sleeping");
-  sleep(2000);
+  console.log("CompiBrain deployed to:", compibrain.address);
 
   const ADMIN_ROLE = '0x0000000000000000000000000000000000000000000000000000000000000000';
   const accounts = await ethers.getSigners();
 
   const trueAdmin = '0xCF10CD8B5Dc2323B1eb6de6164647756BAd4dE4d';
   const fakeAdmin = accounts[0].address;
-
-  console.log("Transferring ownership of ProxyAdmin...");
-  // The owner of the ProxyAdmin can upgrade our contracts
-  await upgrades.admin.transferProxyAdminOwnership(trueAdmin);
-  console.log("Transferred ownership of ProxyAdmin to:", trueAdmin);
 
   console.log("Sleeping");
   sleep(2000);
@@ -48,7 +40,7 @@ async function main() {
   console.log("Revoke admin role");
   const revokeRoleTx = await compibrain.revokeRole(ADMIN_ROLE, fakeAdmin);
   await revokeRoleTx.wait();
-  console.log("Done");*/
+  console.log("Done");
 
 }
 

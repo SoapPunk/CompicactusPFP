@@ -20,7 +20,7 @@ const compi = new CompiNPC(-1, network_compi, true)
 compi.addComponent(new Transform({
     position: new Vector3(8, 1.0, -0.3)
 }))
-compi.addComponent(new Billboard(false, true, false))
+compi.addComponent(new Billboard(false, true, false)) 
 
 //engine.addSystem(new CompiNPCSystem(network_compi))
 
@@ -33,4 +33,4 @@ voxters.addComponent(new Transform({
 }))
 voxters.addComponent(new Billboard(false, true, false))
 
-engine.addSystem(new CompiNPCSystem()) 
+engine.addSystem(new CompiNPCSystem())

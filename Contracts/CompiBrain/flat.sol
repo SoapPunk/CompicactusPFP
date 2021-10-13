@@ -3861,12 +3861,26 @@ contract CompiBrain is
     // map[Contract][tokenId] = Scene
     mapping (address => mapping (uint256 => string)) private _initialScene;
 
+    ERC721Upgradeable private compicactus;
 
     function initialize(string memory domainSeparator) public initializer {
 
         _initializeEIP712(domainSeparator);
 
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
+    }
+
+
+    /**
+    * @dev Set address for the compicactus PFP.
+    * @param _compicactus - an URL to the metadata
+    */
+    function setPFP(address _compicactus) public {
+        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "CompiBrain: must have admin role to change PFP address");
+
+        compicactus = ERC721Upgradeable(_compicactus);
+
+        emit PFPSet(_compicactus);
     }
 
 
@@ -3954,12 +3968,30 @@ contract CompiBrain is
 
         require(keccak256(bytes(_nftQuestions[_contract][id][scene][questionId])) == keccak256(bytes(question)), "CompiBrain: questionId is not pointing to the expected question");
 
-        // Move element to the end
+        // Copy last element to the place of the to-remove element
         _nftQuestions[_contract][id][scene][questionId] = _nftQuestions[_contract][id][scene][ _nftQuestions[_contract][id][scene].length - 1 ];
-        // Remove element
+        // Remove to-remove element
         _nftQuestions[_contract][id][scene].pop();
 
         emit QuestionRemoved(_contract, id, scene, question, questionId);
+    }
+
+
+    function switchQuestions(address _contract, uint256 id, string memory scene, uint256 questionId1, uint256 questionId2)
+        public
+        isOwnerOrOperator(_contract, id)
+    {
+
+        // Save element 1 on last place
+        _nftQuestions[_contract][id][scene].push(_nftQuestions[_contract][id][scene][questionId1]);
+        // Put element 2 in 1
+        _nftQuestions[_contract][id][scene][questionId1] = _nftQuestions[_contract][id][scene][questionId2];
+        // Copy last element to the place of element 2
+        _nftQuestions[_contract][id][scene][questionId2] = _nftQuestions[_contract][id][scene][ _nftQuestions[_contract][id][scene].length - 1 ];
+        // Remove to-remove element
+        _nftQuestions[_contract][id][scene].pop();
+
+        emit QuestionsSwitched(_contract, id, scene, questionId1, questionId1);
     }
 
 
@@ -4049,6 +4081,7 @@ contract CompiBrain is
         ERC721Upgradeable _erc721 = ERC721Upgradeable(_contract);
         bool is_owner = _erc721.ownerOf(id) == _msgSender() || _nftOperator[_contract][id] == _msgSender();
         require(is_owner, "CompiBrain: sender must be the owner or operator of the token");
+        require(compicactus.balanceOf(_msgSender()) > 0, "CompiBrain: sender must own a Compicactus");
 
         _;
     }
@@ -4072,9 +4105,20 @@ contract CompiBrain is
     * @param _contract - ERC721 contract address
     * @param id - Id of the ERC721 token
     * @param scene - Unique name of the scene
+    * @param question - String of the question
     * @param questionId - Id of the question in the array
     */
     event QuestionRemoved(address _contract, uint256 id, string scene, string question, uint256 questionId);
+
+    /**
+    * @dev Emits when owner switches 2 question
+    * @param _contract - ERC721 contract address
+    * @param id - Id of the ERC721 token
+    * @param scene - Unique name of the scene
+    * @param questionId1 - Id of the question 1 in the array
+    * @param questionId2 - Id of the question 2 in the array
+    */
+    event QuestionsSwitched(address _contract, uint256 id, string scene, uint256 questionId1, uint256 questionId2);
 
     /**
     * @dev Emits when an admin flags a NFT
@@ -4107,6 +4151,12 @@ contract CompiBrain is
     * @param scene - Name of the scene
     */
     event InitialSceneSet(address _contract, uint256 id, string scene);
+
+    /**
+    * @dev Emits when the PFP contract is set
+    * @param _compicactus - ERC721 contract address
+    */
+    event PFPSet(address _compicactus);
 
 
     // This is to support Native meta transactions
