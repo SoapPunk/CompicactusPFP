@@ -9,7 +9,7 @@ async function main() {
     const accounts = await ethers.getSigners();
 
     const CompiMinter = await ethers.getContractFactory("CompiMinter")
-    const compiminter = await CompiMinter.attach("")
+    const compiminter = await CompiMinter.attach("0x2E88409bD7eBc3A7b68b808994E2873645b1128D")
     console.log("CompiMinter deployed to:", compiminter.address);
 
     const ADMIN_ROLE = '0x0000000000000000000000000000000000000000000000000000000000000000';

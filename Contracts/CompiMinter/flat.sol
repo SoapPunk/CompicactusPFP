@@ -1,6 +1,6 @@
-// Sources flattened with hardhat v2.6.1 https://hardhat.org
+// Sources flattened with hardhat v2.6.6 https://hardhat.org
 
-// File hardhat/console.sol@v2.6.1
+// File hardhat/console.sol@v2.6.6
 
 // SPDX-License-Identifier: MIT
 pragma solidity >= 0.4.22 <0.9.0;
@@ -1536,7 +1536,7 @@ library console {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol@v4.3.2
 
 
 
@@ -1586,7 +1586,7 @@ abstract contract Initializable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/access/IAccessControlUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/access/IAccessControlUpgradeable.sol@v4.3.2
 
 
 
@@ -1677,7 +1677,7 @@ interface IAccessControlUpgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/access/IAccessControlEnumerableUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/access/IAccessControlEnumerableUpgradeable.sol@v4.3.2
 
 
 
@@ -1709,7 +1709,7 @@ interface IAccessControlEnumerableUpgradeable is IAccessControlUpgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol@v4.3.2
 
 
 
@@ -1743,7 +1743,7 @@ abstract contract ContextUpgradeable is Initializable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol@v4.3.2
 
 
 
@@ -1813,7 +1813,7 @@ library StringsUpgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol@v4.3.2
 
 
 
@@ -1841,7 +1841,7 @@ interface IERC165Upgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol@v4.3.2
 
 
 
@@ -1879,7 +1879,7 @@ abstract contract ERC165Upgradeable is Initializable, IERC165Upgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol@v4.3.2
 
 
 
@@ -2101,7 +2101,7 @@ abstract contract AccessControlUpgradeable is Initializable, ContextUpgradeable,
 }
 
 
-// File @openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol@v4.3.2
 
 
 
@@ -2461,7 +2461,7 @@ library EnumerableSetUpgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgradeable.sol@v4.3.2
 
 
 
@@ -2553,7 +2553,7 @@ abstract contract AccessControlEnumerableUpgradeable is Initializable, IAccessCo
 }
 
 
-// File @openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol@v4.3.2
 
 
 
@@ -2783,7 +2783,7 @@ library SafeMathUpgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol@v4.3.2
 
 
 
@@ -2927,7 +2927,7 @@ interface IERC721Upgradeable is IERC165Upgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol@v4.3.2
 
 
 
@@ -2957,7 +2957,7 @@ interface IERC721ReceiverUpgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721MetadataUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721MetadataUpgradeable.sol@v4.3.2
 
 
 
@@ -2985,7 +2985,7 @@ interface IERC721MetadataUpgradeable is IERC721Upgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol@v4.3.2
 
 
 
@@ -3178,7 +3178,7 @@ library AddressUpgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol@v4.3.2
 
 
 
@@ -3599,7 +3599,7 @@ contract ERC721Upgradeable is Initializable, ContextUpgradeable, ERC165Upgradeab
 }
 
 
-// File @openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721EnumerableUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721EnumerableUpgradeable.sol@v4.3.2
 
 
 
@@ -3629,7 +3629,7 @@ interface IERC721EnumerableUpgradeable is IERC721Upgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol@v4.3.2
 
 
 
@@ -3803,7 +3803,7 @@ abstract contract ERC721EnumerableUpgradeable is Initializable, ERC721Upgradeabl
 }
 
 
-// File @openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol@v4.3.2
 
 
 
@@ -3840,7 +3840,7 @@ abstract contract ERC721BurnableUpgradeable is Initializable, ContextUpgradeable
 }
 
 
-// File @openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol@v4.3.2
 
 
 
@@ -3939,7 +3939,7 @@ abstract contract PausableUpgradeable is Initializable, ContextUpgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721PausableUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721PausableUpgradeable.sol@v4.3.2
 
 
 
@@ -3984,7 +3984,7 @@ abstract contract ERC721PausableUpgradeable is Initializable, ERC721Upgradeable,
 }
 
 
-// File @openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol@v4.3.2
 
 
 
@@ -4030,7 +4030,7 @@ library CountersUpgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/token/ERC721/presets/ERC721PresetMinterPauserAutoIdUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/token/ERC721/presets/ERC721PresetMinterPauserAutoIdUpgradeable.sol@v4.3.2
 
 
 
@@ -4194,7 +4194,7 @@ contract ERC721PresetMinterPauserAutoIdUpgradeable is
 }
 
 
-// File @openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.sol@v4.3.2
 
 
 
@@ -4320,7 +4320,7 @@ interface IERC1155Upgradeable is IERC165Upgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155ReceiverUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155ReceiverUpgradeable.sol@v4.3.2
 
 
 
@@ -4374,7 +4374,7 @@ interface IERC1155ReceiverUpgradeable is IERC165Upgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/token/ERC1155/extensions/IERC1155MetadataURIUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/token/ERC1155/extensions/IERC1155MetadataURIUpgradeable.sol@v4.3.2
 
 
 
@@ -4397,7 +4397,7 @@ interface IERC1155MetadataURIUpgradeable is IERC1155Upgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol@v4.3.2
 
 
 
@@ -4858,7 +4858,7 @@ contract ERC1155Upgradeable is Initializable, ContextUpgradeable, ERC165Upgradea
 }
 
 
-// File @openzeppelin/contracts-upgradeable/token/ERC1155/extensions/ERC1155BurnableUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/token/ERC1155/extensions/ERC1155BurnableUpgradeable.sol@v4.3.2
 
 
 
@@ -4909,7 +4909,7 @@ abstract contract ERC1155BurnableUpgradeable is Initializable, ERC1155Upgradeabl
 }
 
 
-// File @openzeppelin/contracts-upgradeable/token/ERC1155/extensions/ERC1155PausableUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/token/ERC1155/extensions/ERC1155PausableUpgradeable.sol@v4.3.2
 
 
 
@@ -4959,7 +4959,7 @@ abstract contract ERC1155PausableUpgradeable is Initializable, ERC1155Upgradeabl
 }
 
 
-// File @openzeppelin/contracts-upgradeable/token/ERC1155/presets/ERC1155PresetMinterPauserUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/token/ERC1155/presets/ERC1155PresetMinterPauserUpgradeable.sol@v4.3.2
 
 
 
@@ -5103,7 +5103,7 @@ contract ERC1155PresetMinterPauserUpgradeable is Initializable, ContextUpgradeab
 }
 
 
-// File @openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol@v4.3.2
 
 
 
@@ -5188,7 +5188,7 @@ interface IERC20Upgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol@v4.3.2
 
 
 
@@ -5217,7 +5217,7 @@ interface IERC20MetadataUpgradeable is IERC20Upgradeable {
 }
 
 
-// File @openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol@v4.3.2
 
 
 
@@ -5581,7 +5581,7 @@ contract ERC20Upgradeable is Initializable, ContextUpgradeable, IERC20Upgradeabl
 }
 
 
-// File @openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20BurnableUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20BurnableUpgradeable.sol@v4.3.2
 
 
 
@@ -5634,7 +5634,7 @@ abstract contract ERC20BurnableUpgradeable is Initializable, ContextUpgradeable,
 }
 
 
-// File @openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20PausableUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20PausableUpgradeable.sol@v4.3.2
 
 
 
@@ -5678,7 +5678,7 @@ abstract contract ERC20PausableUpgradeable is Initializable, ERC20Upgradeable, P
 }
 
 
-// File @openzeppelin/contracts-upgradeable/token/ERC20/presets/ERC20PresetMinterPauserUpgradeable.sol@v4.3.0
+// File @openzeppelin/contracts-upgradeable/token/ERC20/presets/ERC20PresetMinterPauserUpgradeable.sol@v4.3.2
 
 
 
@@ -6061,7 +6061,7 @@ contract CompiMinter is
 
         _maxMintByAccount = 100;
 
-        _totalTokenAmount = 12346;
+        _totalTokenAmount = 10010-14;
     }
 
 
@@ -6111,6 +6111,14 @@ contract CompiMinter is
         _endTime = endTime;
 
         emit TimeWindowSet(startTime, endTime);
+    }
+
+
+    /**
+    * @dev Get time window
+    */
+    function getTimeWindow() public view returns(uint256 startTime, uint256 endTime) {
+        return (_startTime, _endTime);
     }
 
 

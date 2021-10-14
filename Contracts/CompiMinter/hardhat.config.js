@@ -45,15 +45,15 @@ module.exports = {
             gasPrice: 8000000000
         },
         matic: {
-            //url: 'https://rpc-mainnet.maticvigil.com/v1/'+maticvigil,
-            url: 'https://matic-mainnet.chainstacklabs.com/',
+            url: 'https://rpc-mainnet.maticvigil.com/v1/'+maticvigil,
+            //url: 'https://matic-mainnet.chainstacklabs.com/',
             chainId: 137,
             accounts: {
                 mnemonic: mnemonic,
             },
-            gasPrice: 15000000000,
+            gasPrice: 140000000000, //70
             gasMultiplier: 4,
-            //timeout: 100000
+            timeout: 1000000
         }
     }
 };
