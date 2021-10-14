@@ -6059,10 +6059,28 @@ contract CompiMinter is
 
         setPrice(5000000000000000000);
 
-        _maxMintByAccount = 2;
+        _maxMintByAccount = 100;
 
         _totalTokenAmount = 12346;
     }
+
+
+    function setMaxSupply(uint32 maxSupply) public {
+        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "CompiMinter: must have admin role to set max supply");
+
+        _totalTokenAmount = maxSupply;
+
+        emit MaxSupplySet(maxSupply);
+    }
+
+
+    /**
+    * @dev Max supply, minted count
+    */
+    function getSupply() public view returns(uint32 maxSupply, uint256 currentSupply) {
+        return (_totalTokenAmount, _tokenCount);
+    }
+
 
     function setDiscountTokens(address[] memory discountTokens, bool[] memory discountTokensIsERC1155) public {
         require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "CompiMinter: must have admin role to set price");
@@ -6074,6 +6092,7 @@ contract CompiMinter is
 
         emit DiscountTokensSet(discountTokens, discountTokensIsERC1155);
     }
+
 
     function setPrice(uint256 multPrice) public {
         require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "CompiMinter: must have admin role to set price");
@@ -6256,6 +6275,12 @@ contract CompiMinter is
     * @param multPrice - a multiplier for the price
     */
     event PriceSet(uint256 multPrice);
+
+    /**
+    * @dev Emits when a new max supply is set
+    * @param maxSupply - max amount of tokens to mint
+    */
+    event MaxSupplySet(uint256 maxSupply);
 
     /**
     * @dev Emits when the contract URI is set

@@ -44,6 +44,23 @@ describe("CompiMinter", function () {
         await expect(setDiscountTokensTx).to.be.revertedWith('CompiMinter: array lengths must match');
     });
 
+    it("Prevent setting max supply for non admins", async function () {
+        const setMaxSupplyTx = compiminter.connect(accounts[1]).setMaxSupply(10000);
+
+        await expect(setMaxSupplyTx).to.be.revertedWith('CompiMinter: must have admin role to set max supply');
+    });
+
+    it("Set max supply", async function () {
+        const setMaxSupplyTx = await compiminter.setMaxSupply(10000);
+
+        await setMaxSupplyTx.wait();
+
+        const answer = await compiminter.getSupply();
+
+        expect(answer[0]).to.equal(10000);
+        expect(answer[1]).to.equal(0);
+    });
+
     it("Prevent setting price for non admins", async function () {
         const addQuestionTx = compiminter.connect(accounts[1]).setPrice(10);
 
@@ -146,6 +163,12 @@ describe("CompiMinter", function () {
         const balance = await erc721.balanceOf(accounts[1].address);
 
         expect(balance).to.equal(1);
+
+        // Supply
+        const answer = await compiminter.getSupply();
+
+        expect(answer[0]).to.equal(10000);
+        expect(answer[1]).to.equal(1);
     });
 
     it("Discount depleted", async function () {
@@ -172,13 +195,60 @@ describe("CompiMinter", function () {
         expect(window_status).to.equal(true);
     });
 
+    it("Aditional mints", async function () {
+        for(let n=0; n<10; n++) {
+            // get price
+            const price = await compiminter.getPrice(accounts[1].address);
+
+            // Aprove
+            const approveTx = await erc20.connect(accounts[1]).approve(compiminter.address, price[0]);
+
+            await approveTx.wait();
+
+            // Mint
+            const mintCompiTx = await compiminter.connect(accounts[1]).mintCompi(price[0]);
+
+            await mintCompiTx.wait();
+
+            const balance = await erc721.balanceOf(accounts[1].address);
+
+            expect(balance).to.equal(1+n+1);
+
+            // Supply
+            const answer = await compiminter.getSupply();
+
+            expect(answer[0]).to.equal(10000);
+            expect(answer[1]).to.equal(1+n+1);
+        }
+    });
+
     it("Close window", async function () {
-        const setTimeWindowTx = await compiminter.setTimeWindow(2592000000, 25920000000);
+        const setTimeWindowTx = await compiminter.setTimeWindow(2592000000, 25920000010);
 
         await setTimeWindowTx.wait();
 
-        const window_status2 = await compiminter.isWindowOpen();
+        const window_status = await compiminter.isWindowOpen();
 
-        expect(window_status2).to.equal(false);
+        expect(window_status).to.equal(false);
+
+        const window_status2 = await compiminter.getTimeWindow();
+
+        expect(window_status2[0]).to.equal("2592000000");
+        expect(window_status2[1]).to.equal("25920000010");
+    });
+
+    it("Prevent mining with closed window", async function () {
+        // get price
+        const price = await compiminter.getPrice(accounts[1].address);
+
+        // Aprove
+        const approveTx = await erc20.connect(accounts[1]).approve(compiminter.address, price[0]);
+
+        await approveTx.wait();
+
+        // Mint
+        const mintCompiTx = compiminter.connect(accounts[1]).mintCompi(price[0]);
+
+        await expect(mintCompiTx).to.be.revertedWith('CompiMinter: minting event not started');
     });
 });
