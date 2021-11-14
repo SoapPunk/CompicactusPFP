@@ -17,6 +17,9 @@ npx hardhat help
 Rovi Transporter:
 `0x34777a2e06bcad8a9d324756275ff4950f880d7a`
 
+Rovis:
+`0xadd82df88f40bbc48f467413e9361e4969665237`
+
 Voxters:
 `0x764e5a8c9ca14b456f5afbf31bfb2fa7f1e002b6`
 

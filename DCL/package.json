@@ -14,7 +14,7 @@
     "decentraland-ecs": "^6.6.8-1308395011.commit-a9c44f7"
   },
   "dependencies": {
-    "@compicactus/dcl-scene-utils": "^0.2.0",
+    "@compicactus/dcl-scene-utils": "^0.3.1",
     "decentraland-transactions": "^1.22.2",
     "eth-connect": "^6.0.2"
   },

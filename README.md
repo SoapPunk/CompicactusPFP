@@ -10,6 +10,8 @@ Compicactus PFP project
 
 - MP4 metadata (first 10, B): bafybeicbj4q67wljuxg5bcrgciu2sw5upg4r6z6oq3uvejopumnbbijsoe
 
+- MP4 metadata (first 100, B): bafybeia7pyfmyjcnjrodau2yxm3h3bs6suv3xfzwvhohktnw6v2cevayaq
+
 - JSON metadata (first 25): bafybeidoelak3hobgr2ont6mqeahbmusy77dacacngi5rferribcbxwsiu
 
 - JSON metadata (all 10010): bafybeicp6z4wkbv2jyuyycme4rpmds6lkkkkwjxsuz2a73lm4c3oenlyqe
