@@ -11,11 +11,10 @@
     "ecs:install-next": "npm install --save-dev decentraland-ecs@next"
   },
   "devDependencies": {
-    "decentraland-ecs": "^6.6.8-1308395011.commit-a9c44f7"
+    "decentraland-ecs": "^6.8.0"
   },
   "dependencies": {
-    "@compicactus/dcl-scene-utils": "^0.3.1",
-    "decentraland-transactions": "^1.22.2",
+    "@compicactus/dcl-scene-utils": "^0.3.4",
     "eth-connect": "^6.0.2"
   },
   "bundleDependencies": [
