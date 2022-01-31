@@ -42,7 +42,8 @@ module.exports = {
             accounts: {
                 mnemonic: mnemonic,
             },
-            gasPrice: 8000000000
+            gasPrice: 8000000000,
+            gasMultiplier: 4
         },
         matic: {
             //url: 'https://rpc-mainnet.maticvigil.com/v1/'+maticvigil,
