@@ -1,0 +1,38 @@
+
+type Question @entity {
+    id: ID!
+
+    answer: String
+
+    text: String
+
+    scene: Scene!
+}
+
+type Scene @entity {
+    id: ID!
+
+    nft: NFT!
+
+    name: String
+
+    questions: [Question!] @derivedFrom(field: "scene")
+}
+
+type NFT @entity {
+    id: ID!
+
+    contract: Contract!
+
+    tokenId: BigInt
+
+    scenes: [Scene!] @derivedFrom(field: "nft")
+}
+
+type Contract @entity {
+    id: ID!
+
+    address: String
+
+    nfts: [NFT!] @derivedFrom(field: "contract")
+}
